@@ -1,0 +1,2 @@
+#define ECLPLUS_API __declspec(dllexport)
+#define ECLPLUS_API __declspec(dllimport)
