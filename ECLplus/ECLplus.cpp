@@ -4,26 +4,26 @@
 
 /* Executes an extra ECL instruction, called by the modified game. */
 static VOID __stdcall InsSwitch(ENEMY enm, INSTR* ins) {
-	if (ins->id >= 2000 && ins->id < 2100) {
-		ins_2000(enm, ins);
-	} else {
-		CHAR buf[256];
-		snprintf(buf, 256, "instruction out of range: %d", ins->id);
-		EclMsg(buf);
-	}
+    if (ins->id >= 2000 && ins->id < 2100) {
+        ins_2000(enm, ins);
+    } else {
+        CHAR buf[256];
+        snprintf(buf, 256, "instruction out of range: %d", ins->id);
+        EclMsg(buf);
+    }
 }
 
 DWORD GetIntArg(ENEMY enm, DWORD n) {
-	/* Calling the __thiscall requires assembly */
-	DWORD res;
-	__asm {
-		mov ecx, enm
-		push n
-		mov eax, GameGetIntArg
-		call eax
-		mov res, eax
-	}
-	return res;
+    /* Calling the __thiscall requires assembly */
+    DWORD res;
+    __asm {
+        mov ecx, enm
+        push n
+        mov eax, GameGetIntArg
+        call eax
+        mov res, eax
+    }
+    return res;
 }
 
 DWORD GetIntArgEx(ENEMY enm, DWORD n, DWORD val) {
@@ -40,15 +40,15 @@ DWORD GetIntArgEx(ENEMY enm, DWORD n, DWORD val) {
 }
 
 FLOAT GetFloatArg(ENEMY enm, DWORD n) {
-	FLOAT res;
-	__asm {
-		mov ecx, enm
-		push n
-		mov eax, GameGetFloatArg
-		call eax
-		movd res, xmm0
-	}
-	return res;
+    FLOAT res;
+    __asm {
+        mov ecx, enm
+        push n
+        mov eax, GameGetFloatArg
+        call eax
+        movd res, xmm0
+    }
+    return res;
 }
 
 FLOAT GetFloatArgEx(ENEMY enm, DWORD n, FLOAT val) {
@@ -65,7 +65,7 @@ FLOAT GetFloatArgEx(ENEMY enm, DWORD n, FLOAT val) {
 }
 
 const CHAR* GetStringArg(INSTR* ins, DWORD n) {
-	return (const CHAR*) &(ins->data[n * 4 + 4]);
+    return (const CHAR*) &(ins->data[n * 4 + 4]);
 }
 
 VOID InitConsole() {
@@ -82,18 +82,18 @@ static CONST UCHAR binhackInsCall[] = { 0x52, 0x57, 0xA1, 0xE8, 0x9F, 0x49, 0x00
 static CONST UCHAR binhackInsCallJump[] = { 0x0F, 0x87, 0x09, 0x8D, 0x07, 0x00 };
 VOID init() {
     InitConsole();
-	DWORD old;
-	/* Some code of the game has to be overwritten to call DLL functions. */
-	VirtualProtect(EXPORT_LOC, 4, PAGE_EXECUTE_READWRITE, &old);
-	*(LPVOID*)EXPORT_LOC = (LPVOID)InsSwitch;
+    DWORD old;
+    /* Some code of the game has to be overwritten to call DLL functions. */
+    VirtualProtect(EXPORT_LOC, 4, PAGE_EXECUTE_READWRITE, &old);
+    *(LPVOID*)EXPORT_LOC = (LPVOID)InsSwitch;
     VirtualProtect(EXPORT_LOC, 4, old, &old);
 
-	VirtualProtect(CODECAVE_LOC, sizeof(binhackInsCall), PAGE_READWRITE, &old);
-	CopyMemory(CODECAVE_LOC, binhackInsCall, sizeof(binhackInsCall));
-	VirtualProtect(CODECAVE_LOC, sizeof(binhackInsCall), old, &old);
+    VirtualProtect(CODECAVE_LOC, sizeof(binhackInsCall), PAGE_READWRITE, &old);
+    CopyMemory(CODECAVE_LOC, binhackInsCall, sizeof(binhackInsCall));
+    VirtualProtect(CODECAVE_LOC, sizeof(binhackInsCall), old, &old);
 
-	VirtualProtect(INS_HANDLER_LOC, sizeof(binhackInsCallJump), PAGE_READWRITE, &old);
-	CopyMemory(INS_HANDLER_LOC, binhackInsCallJump, sizeof(binhackInsCallJump));
-	VirtualProtect(INS_HANDLER_LOC, sizeof(binhackInsCallJump), old, &old);
+    VirtualProtect(INS_HANDLER_LOC, sizeof(binhackInsCallJump), PAGE_READWRITE, &old);
+    CopyMemory(INS_HANDLER_LOC, binhackInsCallJump, sizeof(binhackInsCallJump));
+    VirtualProtect(INS_HANDLER_LOC, sizeof(binhackInsCallJump), old, &old);
 }
 

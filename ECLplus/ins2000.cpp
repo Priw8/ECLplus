@@ -35,9 +35,9 @@ static DWORD EclArgList(CHAR* args, ENEMY enm, INSTR* ins, PARAMD* D, DWORD i) {
 }
 
 static VOID EclPrintf(CHAR* buf, DWORD bufSize, INSTR* ins, ENEMY enm) {
-	CONST CHAR* str = GetStringArg(ins, 0);
-	DWORD size = *(DWORD*)(&ins->data[0]); /* this includes padding (its purpose is keeping the rest of the params aligned) */
-	PARAMD* D = (PARAMD*)&ins->data[size + 4]; /* +4 to include the size param */
+    CONST CHAR* str = GetStringArg(ins, 0);
+    DWORD size = *(DWORD*)(&ins->data[0]); /* this includes padding (its purpose is keeping the rest of the params aligned) */
+    PARAMD* D = (PARAMD*)&ins->data[size + 4]; /* +4 to include the size param */
     
     CHAR args[16*8];
     EclArgList(args, enm, ins, D, 1);
@@ -46,12 +46,12 @@ static VOID EclPrintf(CHAR* buf, DWORD bufSize, INSTR* ins, ENEMY enm) {
 }
 
 VOID ins_2000(ENEMY enm, INSTR* ins) {
-	CHAR buf[512];
-	switch (ins->id - 2000) {
-	case INS_MSG_BOX:
-		EclPrintf(buf, sizeof(buf), ins, enm);
+    CHAR buf[512];
+    switch (ins->id - 2000) {
+    case INS_MSG_BOX:
+        EclPrintf(buf, sizeof(buf), ins, enm);
         EclMsg(buf);
-		break;
+        break;
     case INS_PRINTF:
         EclPrintf(buf, sizeof(buf), ins, enm);
         EclPrint(buf);
@@ -78,8 +78,8 @@ VOID ins_2000(ENEMY enm, INSTR* ins) {
     case INS_TEXT_COLOR:
         SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructColor, GetIntArg(enm, 0));
         break;
-	default:
-		snprintf(buf, 256, "bad instruction number: %d", ins->id);
-		EclMsg(buf);
-	}
+    default:
+        snprintf(buf, 256, "bad instruction number: %d", ins->id);
+        EclMsg(buf);
+    }
 }

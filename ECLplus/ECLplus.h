@@ -16,31 +16,31 @@
 #pragma warning(push)
 #pragma warning(disable: 4200)
 typedef struct {
-	DWORD time;
-	WORD id;
-	WORD size;
-	WORD paramMask;
-	/* The rank bitmask.
-	 *   1111LHNE
-	 * Bits mean: easy, normal, hard, lunatic. The rest are always set to 1. */
-	BYTE rankMask;
-	/* There doesn't seem to be a way of telling how many parameters there are
-	 * from the additional data. */
-	BYTE paramCount;
-	/* From TH13 on, this field stores the number of current stack references
-	 * in the parameter list. */
-	DWORD zero;
-	UCHAR data[];
+    DWORD time;
+    WORD id;
+    WORD size;
+    WORD paramMask;
+    /* The rank bitmask.
+     *   1111LHNE
+     * Bits mean: easy, normal, hard, lunatic. The rest are always set to 1. */
+    BYTE rankMask;
+    /* There doesn't seem to be a way of telling how many parameters there are
+     * from the additional data. */
+    BYTE paramCount;
+    /* From TH13 on, this field stores the number of current stack references
+     * in the parameter list. */
+    DWORD zero;
+    UCHAR data[];
 } INSTR;
 #pragma warning(pop)
 #pragma pack(pop)
 
 #pragma pack(push, 1)
 typedef struct {
-	union {
-		DWORD S;
-		FLOAT f;
-	};
+    union {
+        DWORD S;
+        FLOAT f;
+    };
 } MIXEDVAL;
 #pragma pack(pop)
 
@@ -98,7 +98,7 @@ const CHAR* GetStringArg(INSTR* ins, DWORD n);
 
 /* Shows a message box of the given content, */
 inline VOID EclMsg(CONST CHAR* str) {
-	MessageBoxA(NULL, str, "ExtraIns", MB_OK);
+    MessageBoxA(NULL, str, "ExtraIns", MB_OK);
 }
 
 /* Prints given string in the console. */
