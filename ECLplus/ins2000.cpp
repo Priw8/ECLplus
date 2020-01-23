@@ -75,6 +75,9 @@ VOID ins_2000(ENEMY enm, INSTR* ins) {
         EclPrintRender(x + 192.0f + 32.0f, y + 16.0f, format, len, buf);
         break;
     }
+    case INS_TEXT_COLOR:
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructColor, GetIntArg(enm, 0));
+        break;
 	default:
 		snprintf(buf, 256, "bad instruction number: %d", ins->id);
 		EclMsg(buf);

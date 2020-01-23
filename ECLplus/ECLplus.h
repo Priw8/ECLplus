@@ -56,6 +56,10 @@ typedef struct {
 typedef LPVOID ENEMY;
 typedef double DOUBLE;
 
+#define SetDwordField(ptr,off,val) (*((DWORD*)(ptr + off)) = val)
+#define SetFloatField(ptr,off,val) (*((FLOAT*)(ptr + off)) = val)
+#define Deref(x) (*(DWORD*)x)
+
 #define EXPORT_LOC ((DWORD*)0x00499FE8)
 #define GameGetIntArg 0x00428CC0
 #define GameGetFloatArg 0x00428CF0
@@ -107,6 +111,7 @@ inline VOID EclPrint(CONST CHAR* str) {
 
 #define GamePrintRender 0x004082B0
 #define GamePrintRenderArg 0x004B7678
+#define GamePrintRenderStructColor 0x00019214
 
 /* Prints given string on the given coordinates within the game window. */
 inline VOID EclPrintRender(FLOAT x, FLOAT y, CONST CHAR* format, DWORD len, CHAR* data) {
