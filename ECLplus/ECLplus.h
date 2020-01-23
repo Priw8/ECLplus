@@ -113,7 +113,6 @@ inline VOID EclPrintRender(FLOAT x, FLOAT y, CONST CHAR* format, DWORD len, CHAR
     POINTFLOAT p;
     p.x = x;
     p.y = y;
-    POINTFLOAT* pp = &p;
     __asm {
         mov eax, data
         mov edx, eax
@@ -126,7 +125,8 @@ inline VOID EclPrintRender(FLOAT x, FLOAT y, CONST CHAR* format, DWORD len, CHAR
         jmp PUSH_LOOP
     PUSH_LOOP_END:
         push format
-        push pp
+        lea eax, p
+        push eax
         mov eax, GamePrintRenderArg
         push [eax]
         mov eax, GamePrintRender
