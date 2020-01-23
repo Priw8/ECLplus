@@ -78,13 +78,22 @@ VOID InitConsole() {
     EclPrint("ECLplus v0.1 by Priw8\n");
 }
 
+static CONST UCHAR binhackInsCall[] = { 0x52, 0x57, 0xA1, 0xE8, 0x9F, 0x49, 0x00, 0xFF, 0xD0, 0xB8, 0xF2, 0x65, 0x42, 0x00, 0xFF, 0xE0 };
+static CONST UCHAR binhackInsCallJump[] = { 0x0F, 0x87, 0x09, 0x8D, 0x07, 0x00 };
 VOID init() {
     InitConsole();
 	DWORD old;
-    /* Write the pointer to DLL function where the game expects it.
-     * It is assumed that the game was modified to load the DLL
-     * and call this function beforehand. */
+	/* Some code of the game has to be overwritten to call DLL functions. */
 	VirtualProtect(EXPORT_LOC, 4, PAGE_EXECUTE_READWRITE, &old);
-	*EXPORT_LOC = (DWORD)InsSwitch;
+	*(LPVOID*)EXPORT_LOC = (LPVOID)InsSwitch;
     VirtualProtect(EXPORT_LOC, 4, old, &old);
+
+	VirtualProtect(CODECAVE_LOC, sizeof(binhackInsCall), PAGE_READWRITE, &old);
+	CopyMemory(CODECAVE_LOC, binhackInsCall, sizeof(binhackInsCall));
+	VirtualProtect(CODECAVE_LOC, sizeof(binhackInsCall), old, &old);
+
+	VirtualProtect(INS_HANDLER_LOC, sizeof(binhackInsCallJump), PAGE_READWRITE, &old);
+	CopyMemory(INS_HANDLER_LOC, binhackInsCallJump, sizeof(binhackInsCallJump));
+	VirtualProtect(INS_HANDLER_LOC, sizeof(binhackInsCallJump), old, &old);
 }
+

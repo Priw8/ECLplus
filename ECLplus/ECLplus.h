@@ -60,7 +60,10 @@ typedef double DOUBLE;
 #define SetFloatField(ptr,off,val) (*((FLOAT*)(ptr + off)) = val)
 #define Deref(x) (*(DWORD*)x)
 
-#define EXPORT_LOC ((DWORD*)0x00499FE8)
+#define EXPORT_LOC ((LPVOID)0x00499FE8)
+#define CODECAVE_LOC ((LPVOID)0x00499EBA)
+#define INS_HANDLER_LOC ((LPVOID)0x004211AB)
+
 #define GameGetIntArg 0x00428CC0
 #define GameGetFloatArg 0x00428CF0
 #define GameGetIntArgEx 0x00428D30
