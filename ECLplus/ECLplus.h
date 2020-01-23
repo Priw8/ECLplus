@@ -58,11 +58,19 @@ typedef double DOUBLE;
 
 #define SetDwordField(ptr,off,val) (*((DWORD*)(ptr + off)) = val)
 #define SetFloatField(ptr,off,val) (*((FLOAT*)(ptr + off)) = val)
+#define GetDwordField(ptr,off) (*((DWORD*)(ptr + off)))
+#define GetFloatField(ptr,off) (*((FLOAT*)(ptr + off)))
 #define Deref(x) (*(DWORD*)x)
 
 #define EXPORT_LOC ((LPVOID)0x00499FE8)
 #define CODECAVE_LOC ((LPVOID)0x00499EBA)
 #define INS_HANDLER_LOC ((LPVOID)0x004211AB)
+
+#define EXPORT_INTVAR_LOC ((LPVOID)0x00499FE4)
+#define INTVARGET_HANDLER_LOC ((LPVOID)0x00427524)
+#define CODECAVE_INTVARGET_LOC ((LPVOID)0x00499ECA)
+#define INTVARADDR_HANDLER_LOC ((LPVOID)0x00427Cf1)
+#define CODECAVE_INTVARADDR_LOC ((LPVOID)0x00499EDB)
 
 #define GameGetIntArg 0x00428CC0
 #define GameGetFloatArg 0x00428CF0

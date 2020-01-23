@@ -13,6 +13,9 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="intvar.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -22,6 +25,9 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="ins2000.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="intvar.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

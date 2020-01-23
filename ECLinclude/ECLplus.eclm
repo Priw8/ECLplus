@@ -5,3 +5,15 @@
 2002 cls
 2003 drawf
 2004 drawColor
+
+!gvar_names
+-8000 INPUT
+-7999 SCORE
+-7998 HIGHSCORE
+-7997 BOMBING
+
+!gvar_types
+-8000 $
+-7999 $
+-7998 $
+-7997 $

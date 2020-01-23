@@ -1,5 +1,5 @@
 # ECLplus
-ECLplus is a modification for Touhou 17 - Wily Beast and Weakest Creature. It's main goal is adding more instructions for ECL scripts.
+ECLplus is a modification for Touhou 17 - Wily Beast and Weakest Creature. It's main goal is adding more functionalities for ECL scripts - this includes both custom instructions and custom variables.
 
 ## Usage
 ### Installation
@@ -14,3 +14,9 @@ In your ECL source file, `#include` the `ECLplus.tecl` script from the `ECLinclu
 - `cls()` - clears the console.
 - `drawf(string format, float x, float y, ...)` - draws a printf-formatted string on the given coordinates in the game window (ECL coordinate system). Top-left corner of the string corresponds to the coordinates given. It will only be drawn for 1 frame, in order to keep it displayed all the time `drawf` needs to be in a loop.
 - `drawColor(int c)` - sets color of strings drawn by `drawf`. Example: `drawColor(0xFF00FF00)` sets color to green. The order is reversed (ABGR), so this has alpha value of `FF`, blue value of `00`, green value of `FF` and red value of `00`.
+
+## Variable list
+- `INPUT` - int, player input bitmask (works with replays). Writing to it has no effect.
+- `SCORE` - int, score of the player (not including the last digit). Writable.
+- `HIGHSCORE` - int, highscore of the player (not including the last digit). Writable.
+- `BOMBING` - int, 1 if player is bombing, 0 otherwise. Not writable.
