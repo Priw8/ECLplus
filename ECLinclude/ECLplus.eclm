@@ -1,0 +1,7 @@
+!eclmap
+!ins_names
+2000 msgf
+2001 printf
+2002 cls
+2003 drawf
+2004 drawColor
