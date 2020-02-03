@@ -164,6 +164,7 @@
   <ItemGroup>
     <ClInclude Include="ins2000.h" />
     <ClInclude Include="ins2100.h" />
+    <ClInclude Include="ins2200.h" />
     <ClInclude Include="intvar.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ECLplus.h" />
@@ -171,6 +172,7 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ins2100.cpp" />
+    <ClCompile Include="ins2200.cpp" />
     <ClCompile Include="intvar.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

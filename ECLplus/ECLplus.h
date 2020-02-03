@@ -83,6 +83,11 @@ typedef double DOUBLE;
 #define GameGetIntArgEx 0x00428D30
 #define GameGetFloatArgEx 0x00428DE0
 
+#define GameGetIntArgAddr 0x00428CE0
+#define GameGetFloatArgAddr 0x00428D10
+
+#define WriteIfNotNull(x, y) (if (x != NULL) *x = y)
+
 // #define GetVm(x) (DWORD*)(*((DWORD*)(*(x+0x000044D8))+0x0C))
 
 
@@ -109,6 +114,14 @@ FLOAT GetFloatArgEx(ENEMY enm, DWORD n, FLOAT val);
    which is the nth arg. Assumes that there are
    no other string arguments in the ins. */
 const CHAR* GetStringArg(INSTR* ins, DWORD n);
+
+/* Returns a pointer to the int variable passed as the nth argument.
+ * NOTE: only works for n=0 because of optimizations MSVC did on WBaWC 
+ * (game only ever calls this with n=0) */
+DWORD* GetIntArgAddr(ENEMY enm, DWORD n);
+
+/* Returns a pointer to the float variable passed as the nth argument. */
+FLOAT* GetFloatArgAddr(ENEMY enm, DWORD n);
 
 /* Shows a message box of the given content, */
 inline VOID EclMsg(CONST CHAR* str) {

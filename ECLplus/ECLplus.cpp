@@ -2,6 +2,7 @@
 #include "ECLplus.h"
 #include "ins2000.h"
 #include "ins2100.h"
+#include "ins2200.h"
 #include "intvar.h"
 
 /* Executes an extra ECL instruction, called by the modified game. */
@@ -12,7 +13,10 @@ static VOID __stdcall InsSwitch(ENEMY enm, INSTR* ins) {
         success = ins_2000(enm, ins);
     } else if (ins->id >= 2100 && ins->id < 2200) {
         success = ins_2100(enm, ins);
+    } else if (ins->id >= 2200 && ins->id < 2300) {
+        success = ins_2200(enm, ins);
     } else {
+        success = true;
         snprintf(buf, 256, "instruction out of range: %d", ins->id);
         EclMsg(buf);
     }
@@ -82,6 +86,30 @@ FLOAT GetFloatArgEx(ENEMY enm, DWORD n, FLOAT val) {
 
 const CHAR* GetStringArg(INSTR* ins, DWORD n) {
     return (const CHAR*) &(ins->data[n * 4 + 4]);
+}
+
+DWORD* GetIntArgAddr(ENEMY enm, DWORD n) {
+    DWORD* res;
+    __asm {
+        mov ecx, enm
+        push n
+        mov eax, GameGetIntArgAddr
+        call eax
+        mov res, eax
+    }
+    return res;
+}
+
+FLOAT* GetFloatArgAddr(ENEMY enm, DWORD n) {
+    FLOAT* res;
+    __asm {
+        mov ecx, enm
+        push n
+        mov eax, GameGetFloatArgAddr
+        call eax
+        mov res, eax
+    }
+    return res;
 }
 
 VOID InitConsole() {

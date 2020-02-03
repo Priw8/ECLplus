@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <map>
+#include <list>
 #include <windows.h>
 
 #endif //PCH_H
