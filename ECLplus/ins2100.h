@@ -9,6 +9,12 @@ enum INS2100 {
     INS_PLAYER_SET_BOMBS
 };
 
+#define PlayerPtr 0x004B77D0
+#define Player (Deref(PlayerPtr))
+#define PlayerXField 0x61C
+#define PlayerYField 0x620
+#define PlayerStateField 0x18DB0
+
 #define PlayerLivesPtr 0x004B5A40
 #define PlayerLives Deref(PlayerLivesPtr)
 
