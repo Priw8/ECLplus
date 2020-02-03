@@ -45,7 +45,7 @@ static VOID EclPrintf(CHAR* buf, DWORD bufSize, INSTR* ins, ENEMY enm) {
     vsnprintf(buf, bufSize, str, (va_list)args);
 }
 
-VOID ins_2000(ENEMY enm, INSTR* ins) {
+BOOL ins_2000(ENEMY enm, INSTR* ins) {
     CHAR buf[512];
     switch (ins->id - 2000) {
     case INS_MSG_BOX:
@@ -79,7 +79,7 @@ VOID ins_2000(ENEMY enm, INSTR* ins) {
         SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructColor, GetIntArg(enm, 0));
         break;
     default:
-        snprintf(buf, 256, "bad instruction number: %d", ins->id);
-        EclMsg(buf);
+        return FALSE;
     }
+    return TRUE;
 }

@@ -6,6 +6,8 @@
 2003 drawf
 2004 drawColor
 
+2100 playerPos
+
 !gvar_names
 -8000 INPUT
 -7999 SCORE

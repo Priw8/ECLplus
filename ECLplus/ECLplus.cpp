@@ -1,15 +1,23 @@
 #include "pch.h"
 #include "ECLplus.h"
 #include "ins2000.h"
+#include "ins2100.h"
 #include "intvar.h"
 
 /* Executes an extra ECL instruction, called by the modified game. */
 static VOID __stdcall InsSwitch(ENEMY enm, INSTR* ins) {
+    CHAR buf[256];
+    BOOL success;
     if (ins->id >= 2000 && ins->id < 2100) {
-        ins_2000(enm, ins);
+        success = ins_2000(enm, ins);
+    } else if (ins->id >= 2100 && ins->id < 2200) {
+        success = ins_2100(enm, ins);
     } else {
-        CHAR buf[256];
         snprintf(buf, 256, "instruction out of range: %d", ins->id);
+        EclMsg(buf);
+    }
+    if (!success) {
+        snprintf(buf, 256, "bad instruction number: %d", ins->id);
         EclMsg(buf);
     }
 }

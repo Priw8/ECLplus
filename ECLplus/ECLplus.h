@@ -77,6 +77,11 @@ typedef double DOUBLE;
 #define GameGetIntArgEx 0x00428D30
 #define GameGetFloatArgEx 0x00428DE0
 
+#define PlayerPtr 0x004B77D0
+#define Player (Deref(PlayerPtr))
+#define PlayerXField 0x61C
+#define PlayerYField 0x620
+
 // #define GetVm(x) (DWORD*)(*((DWORD*)(*(x+0x000044D8))+0x0C))
 
 

@@ -10,4 +10,4 @@ enum INS2000 {
 };
 
 /* INS_2000 series: general debug utilities */
-VOID ins_2000(ENEMY enm, INSTR* ins);
+BOOL ins_2000(ENEMY enm, INSTR* ins);
