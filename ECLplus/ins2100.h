@@ -2,7 +2,8 @@
 #include "ECLplus.h"
 
 enum INS2100 {
-    INS_PLAYER_POS
+    INS_PLAYER_POS,
+    INS_PLAYER_KILL
 };
 
 /* INS_2100 series: player manipulation */

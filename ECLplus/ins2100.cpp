@@ -8,6 +8,9 @@ BOOL ins_2100(ENEMY enm, INSTR* ins) {
             SetDwordField(Player, PlayerXField, (LONG)(GetFloatArg(enm, 0) * 128.0f));
             SetDwordField(Player, PlayerYField, (LONG)(GetFloatArg(enm, 1) * 128.0f));
             break;
+        case INS_PLAYER_KILL:
+            SetDwordField(Player, PlayerStateField, 4);
+            break;
         default:
             return FALSE;
     }

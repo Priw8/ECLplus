@@ -87,6 +87,7 @@ typedef double DOUBLE;
 #define Player (Deref(PlayerPtr))
 #define PlayerXField 0x61C
 #define PlayerYField 0x620
+#define PlayerStateField 0x18DB0
 
 // #define GetVm(x) (DWORD*)(*((DWORD*)(*(x+0x000044D8))+0x0C))
 
