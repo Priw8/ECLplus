@@ -103,6 +103,42 @@ static CONST UCHAR binhackIntVarJump[] = { 0x0F, 0x87, 0xA0, 0x29, 0x07, 0x00 };
 
 static CONST UCHAR binhackIntVarAddr[] = { 0x6A, 0x01, 0x52, 0x83, 0xC0, 0x0F, 0x50, 0xA1, 0xE4, 0x9F, 0x49, 0x00, 0xFF, 0xD0, 0x5E, 0x5D, 0xC2, 0x04, 0x00 };
 static CONST UCHAR binhackIntVarAddrJump[] = { 0x0F, 0x87, 0xE4, 0x21, 0x07, 0x00 };
+
+CONST BINHACK binhacks[] = {
+    {
+        CODECAVE_LOC,
+        binhackInsCall,
+        sizeof(binhackInsCall)
+    },
+    {
+        INS_HANDLER_LOC,
+        binhackInsCallJump,
+        sizeof(binhackInsCallJump)
+    },
+    {
+        CODECAVE_INTVARGET_LOC,
+        binhackIntVar,
+        sizeof(binhackIntVar)
+    },
+    {
+        INTVARGET_HANDLER_LOC,
+        binhackIntVarJump,
+        sizeof(binhackIntVarJump)
+    },
+    {
+        CODECAVE_INTVARADDR_LOC,
+        binhackIntVarAddr,
+        sizeof(binhackIntVarAddr)
+    },
+    {
+        INTVARADDR_HANDLER_LOC,
+        binhackIntVarAddrJump,
+        sizeof(binhackIntVarAddrJump)
+    }
+};
+
+#define BHACKLEN (sizeof(binhacks) / sizeof(BINHACK))
+
 VOID init() {
     InitConsole();
     DWORD old;
@@ -112,33 +148,16 @@ VOID init() {
     *(LPVOID*)EXPORT_LOC = (LPVOID)InsSwitch;
     VirtualProtect(EXPORT_LOC, 4, old, &old);
 
-    VirtualProtect(CODECAVE_LOC, sizeof(binhackInsCall), PAGE_READWRITE, &old);
-    CopyMemory(CODECAVE_LOC, binhackInsCall, sizeof(binhackInsCall));
-    VirtualProtect(CODECAVE_LOC, sizeof(binhackInsCall), old, &old);
-
-    VirtualProtect(INS_HANDLER_LOC, sizeof(binhackInsCallJump), PAGE_READWRITE, &old);
-    CopyMemory(INS_HANDLER_LOC, binhackInsCallJump, sizeof(binhackInsCallJump));
-    VirtualProtect(INS_HANDLER_LOC, sizeof(binhackInsCallJump), old, &old);
-
-    /* Integer variables: */
     VirtualProtect(EXPORT_INTVAR_LOC, 4, PAGE_EXECUTE_READWRITE, &old);
     *(LPVOID*)EXPORT_INTVAR_LOC = (LPVOID)IntVarSwitch;
     VirtualProtect(EXPORT_INTVAR_LOC, 4, old, &old);
 
-    VirtualProtect(CODECAVE_INTVARGET_LOC, sizeof(binhackIntVar), PAGE_READWRITE, &old);
-    CopyMemory(CODECAVE_INTVARGET_LOC, binhackIntVar, sizeof(binhackIntVar));
-    VirtualProtect(CODECAVE_INTVARGET_LOC, sizeof(binhackIntVar), old, &old);
+    for (DWORD i=0; i<BHACKLEN; ++i) {
+        CONST BINHACK* hack = &binhacks[i];
+        VirtualProtect(hack->addr, hack->codelen, PAGE_READWRITE, &old);
+        CopyMemory(hack->addr, hack->code, hack->codelen);
+        VirtualProtect(hack->addr, hack->codelen, old, &old);
 
-    VirtualProtect(INTVARGET_HANDLER_LOC, sizeof(binhackIntVarJump), PAGE_READWRITE, &old);
-    CopyMemory(INTVARGET_HANDLER_LOC, binhackIntVarJump, sizeof(binhackIntVarJump));
-    VirtualProtect(INTVARGET_HANDLER_LOC, sizeof(binhackIntVarJump), old, &old);
-
-    VirtualProtect(CODECAVE_INTVARADDR_LOC, sizeof(binhackIntVarAddr), PAGE_READWRITE, &old);
-    CopyMemory(CODECAVE_INTVARADDR_LOC, binhackIntVarAddr, sizeof(binhackIntVarAddr));
-    VirtualProtect(CODECAVE_INTVARADDR_LOC, sizeof(binhackIntVarAddr), old, &old);
-
-    VirtualProtect(INTVARADDR_HANDLER_LOC, sizeof(binhackIntVarAddrJump), PAGE_READWRITE, &old);
-    CopyMemory(INTVARADDR_HANDLER_LOC, binhackIntVarAddrJump, sizeof(binhackIntVarAddrJump));
-    VirtualProtect(INTVARADDR_HANDLER_LOC, sizeof(binhackIntVarAddrJump), old, &old);
+    }
 }
 

@@ -53,6 +53,12 @@ typedef struct {
 } PARAMD;
 #pragma pack(pop)
 
+typedef struct {
+    LPVOID addr;
+    CONST UCHAR* code;
+    DWORD codelen;
+} BINHACK;
+
 typedef LPVOID ENEMY;
 typedef double DOUBLE;
 
