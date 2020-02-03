@@ -91,7 +91,7 @@ VOID InitConsole() {
      * on error, since the console might actually be there, fully functional.
      * Instead, the EclPrint function will display an error if it's
      * unable to get the stdout handle. */
-    EclPrint("ECLplus v0.1 by Priw8\n");
+    EclPrint("ECLplus v0.2 by Priw8\n");
 }
 
 /* TODO: rework how binhacks are applied (make some array of structures and iterate over it) */
