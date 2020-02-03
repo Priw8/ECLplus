@@ -16,12 +16,12 @@ In your ECL source file, `#include` the `ECLplus.tecl` script from the `ECLinclu
 - `drawf(string format, float x, float y, ...)` - draws a printf-formatted string on the given coordinates in the game window (ECL coordinate system). Top-left corner of the string corresponds to the coordinates given. It will only be drawn for 1 frame, in order to keep it displayed all the time `drawf` needs to be in a loop.
 - `drawColor(int c)` - sets color of strings drawn by `drawf`. Example: `drawColor(0xFF00FF00)` sets color to green. The order is reversed (ABGR), so this has alpha value of `FF`, blue value of `00`, green value of `FF` and red value of `00`.
 
-**ins_2100 series: player manipulation**
-`playerPos(float x, float y)` - move the player to the given coordinates.
-`playerKill()` - immidiately kill the player.
-`playerBomb()` - immidiately make the player bomb (even if there are 0 bombs, though using this instruction does take away a bomb from the player).
-`playerSetLives(int lives)` - set the amount of lives to the given amount.
-`playerSetBombs(int bombs)` - set the amount of bombs to the given amount.
+**ins_2100 series: player manipulation**  
+- `playerPos(float x, float y)` - move the player to the given coordinates.
+- `playerKill()` - immidiately kill the player.
+- `playerBomb()` - immidiately make the player bomb (even if there are 0 bombs, though using this instruction does take away a bomb from the player).
+- `playerSetLives(int lives)` - set the amount of lives to the given amount.
+- `playerSetBombs(int bombs)` - set the amount of bombs to the given amount.
 
 ## Variable list
 - `INPUT` - int, player input bitmask (works with replays). Writing to it has no effect.
