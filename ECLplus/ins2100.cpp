@@ -11,6 +11,9 @@ BOOL ins_2100(ENEMY enm, INSTR* ins) {
         case INS_PLAYER_KILL:
             SetDwordField(Player, PlayerStateField, 4);
             break;
+        case INS_PLAYER_BOMB:
+            ((void(__stdcall *)())0x00411C30)();
+            break;
         default:
             return FALSE;
     }

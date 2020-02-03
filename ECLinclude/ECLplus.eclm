@@ -8,6 +8,7 @@
 
 2100 playerPos
 2101 playerKill
+2102 playerBomb
 
 !gvar_names
 -8000 INPUT
