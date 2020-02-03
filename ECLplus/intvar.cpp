@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "intvar.h"
+#include "ins2100.h"
 
 DWORD IntVarGetVal(ENEMY enm, DWORD var) {
     switch(var + 8000) {
@@ -11,6 +12,10 @@ DWORD IntVarGetVal(ENEMY enm, DWORD var) {
             return *INTVAR_HISCORE_LOC;
         case INTVAR_BOMBING:
             return INTVAR_BOMBING_VAL;
+        case INTVAR_LIVES:
+            return PlayerLives;
+        case INTVAR_BOMBS:
+            return PlayerBombs;
         default:
             return 0;
     }
@@ -27,6 +32,13 @@ DWORD* IntVarGetAddr(ENEMY enm, DWORD var) {
             return INTVAR_HISCORE_LOC;
         case INTVAR_BOMBING:
             EclPrint("Warning: variable BOMBING is read-only\n");
+            return &invalidAddr;
+        case INTVAR_LIVES:
+        case INTVAR_BOMBS:
+            EclPrint(
+                "Warning: LIVES/BOMBS variables are read-only, due to issues with writing them directly. "
+                "Use playerSetLives/playerSetBombs instructions instead.\n"
+            );
             return &invalidAddr;
         default:
             return &invalidAddr;
