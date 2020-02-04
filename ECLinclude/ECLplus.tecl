@@ -10,3 +10,20 @@
 #ins "2102"
 #ins "2103 S"
 #ins "2104 S"
+
+#ins "2200"
+#ins "2201 S"
+#ins "2202 ffffS"
+#ins "2203 SffffS"
+#ins "2204 SffffS"
+#ins "2205 SS"
+
+inline void msgWait(int channel) {
+	int received = false;
+	goto BEGIN;
+LOOP:
+	wait(1);
+BEGIN:
+	msgCheck(received, channel);
+	unless (received) goto LOOP;
+}

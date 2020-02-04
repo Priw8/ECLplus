@@ -12,6 +12,13 @@
 2103 playerSetLives
 2104 playerSetBombs
 
+2200 msgResetAll
+2201 msgReset
+2202 msgSend
+2203 msgReceive
+2204 msgPeek
+2205 msgCheck
+
 !gvar_names
 -8000 INPUT
 -7999 SCORE

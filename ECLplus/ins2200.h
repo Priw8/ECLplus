@@ -5,7 +5,9 @@ enum INS2200 {
     INS_MSG_RESET,
     INS_MSG_RESET_CHANNEL,
     INS_MSG_SEND,
-    INS_MSG_RECEIVE
+    INS_MSG_RECEIVE,
+    INS_MSG_PEEK,
+    INS_MSG_CHECK
 };
 
 typedef struct {

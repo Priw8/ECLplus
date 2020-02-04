@@ -37,12 +37,13 @@ static VOID MsgSend(DWORD channel, MESSAGE* msg) {
     list->push_back(msg);
 }
 
-static MESSAGE* MsgReceive(DWORD channel) {
+static MESSAGE* MsgReceive(DWORD channel, BOOL pop) {
     auto itr = msgmap.find(channel);
     if (itr != msgmap.end()) {
         if (!itr->second->empty()) {
             MESSAGE* msg = itr->second->front();
-            itr->second->pop_front();
+            if (pop)
+                itr->second->pop_front();
             return msg;
         }
     }
@@ -66,8 +67,9 @@ BOOL ins_2200(ENEMY enm, INSTR* ins) {
             MsgSend(GetIntArg(enm, 4), msg);
             break;
         }
-        case INS_MSG_RECEIVE: {
-            MESSAGE* msg = MsgReceive(GetIntArg(enm, 5));
+        case INS_MSG_RECEIVE:
+        case INS_MSG_PEEK: {
+            MESSAGE* msg = MsgReceive(GetIntArg(enm, 5), (ins->id - 2200) != INS_MSG_PEEK);
             
             DWORD* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) *ptr = msg == NULL ? 0 : 1;
@@ -83,7 +85,14 @@ BOOL ins_2200(ENEMY enm, INSTR* ins) {
             fptr = GetFloatArgAddr(enm, 4);
             if (fptr != NULL) *fptr = msg->d;
 
-            delete msg;
+            if ((ins->id - 2200) != INS_MSG_PEEK)
+                delete msg;
+
+            break;
+        }
+        case INS_MSG_CHECK: {
+            DWORD* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) *ptr = MsgReceive(GetIntArg(enm, 1), FALSE) != NULL;
             break;
         }
         default:
