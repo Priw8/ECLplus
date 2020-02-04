@@ -16,6 +16,10 @@ DWORD IntVarGetVal(ENEMY enm, DWORD var) {
             return PlayerLives;
         case INTVAR_BOMBS:
             return PlayerBombs;
+        case INTVAR_GRAZE:
+            return *INTVAR_GRAZE_LOC;
+        case INTVAR_PIV:
+            return *INTVAR_PIV_LOC;
         default:
             return 0;
     }
@@ -40,6 +44,10 @@ DWORD* IntVarGetAddr(ENEMY enm, DWORD var) {
                 "Use playerSetLives/playerSetBombs instructions instead.\n"
             );
             return &invalidAddr;
+        case INTVAR_GRAZE:
+            return INTVAR_GRAZE_LOC;
+        case INTVAR_PIV:
+            return INTVAR_PIV_LOC;
         default:
             return &invalidAddr;
     }

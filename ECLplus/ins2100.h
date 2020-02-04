@@ -6,7 +6,8 @@ enum INS2100 {
     INS_PLAYER_KILL,
     INS_PLAYER_BOMB,
     INS_PLAYER_SET_LIVES,
-    INS_PLAYER_SET_BOMBS
+    INS_PLAYER_SET_BOMBS,
+    INS_PLAYER_SET_POWER
 };
 
 #define PlayerPtr 0x004B77D0
@@ -20,6 +21,9 @@ enum INS2100 {
 
 #define PlayerBombsPtr 0x004B5A4C
 #define PlayerBombs Deref(PlayerBombsPtr)
+
+#define PlayerPowerPtr 0x004B5A30
+#define PlayerPower Deref(PlayerPowerPtr)
 
 /* INS_2100 series: player manipulation */
 BOOL ins_2100(ENEMY enm, INSTR* ins);

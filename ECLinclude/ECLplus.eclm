@@ -11,6 +11,7 @@
 2102 playerBomb
 2103 playerSetLives
 2104 playerSetBombs
+2105 playerSetPower
 
 2200 msgResetAll
 2201 msgReset
@@ -26,6 +27,8 @@
 -7997 BOMBING
 -7996 LIVES
 -7995 BOMBS
+-7994 GRAZE
+-7993 PIV
 
 !gvar_types
 -8000 $
@@ -34,3 +37,5 @@
 -7997 $
 -7996 $
 -7995 $
+-7994 $
+-7993 $

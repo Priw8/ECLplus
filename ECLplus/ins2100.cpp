@@ -36,6 +36,15 @@ BOOL ins_2100(ENEMY enm, INSTR* ins) {
                 call eax
             }
             break;
+        case INS_PLAYER_SET_POWER:
+            PlayerPower = GetIntArg(enm, 0);
+            __asm {
+                mov ecx, DWORD_PTR[PlayerPtr]
+                lea ecx, DWORD_PTR[ecx + 0x00000610]
+                mov eax, 0x00449630
+                call eax
+            }
+            break;
         default:
             return FALSE;
     }
