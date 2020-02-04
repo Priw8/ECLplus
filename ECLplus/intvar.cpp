@@ -20,6 +20,10 @@ DWORD IntVarGetVal(ENEMY enm, DWORD var) {
             return *INTVAR_GRAZE_LOC;
         case INTVAR_PIV:
             return *INTVAR_PIV_LOC;
+        case INTVAR_CONTINUES:
+            return *INTVAR_CONTINUES_LOC;
+        case INTVAR_CREDITS:
+            return *INTVAR_CREDITS_LOC;
         default:
             return 0;
     }
@@ -48,6 +52,10 @@ DWORD* IntVarGetAddr(ENEMY enm, DWORD var) {
             return INTVAR_GRAZE_LOC;
         case INTVAR_PIV:
             return INTVAR_PIV_LOC;
+        case INTVAR_CONTINUES:
+            return INTVAR_CONTINUES_LOC;
+        case INTVAR_CREDITS:
+            return INTVAR_CREDITS_LOC;
         default:
             return &invalidAddr;
     }
