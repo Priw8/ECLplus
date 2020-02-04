@@ -29,3 +29,12 @@ BEGIN:
 	msgCheck(received, channel);
 	unless (received) goto LOOP;
 }
+
+global KEY_SHOOT = 0x1;
+global KEY_BOMB = 0x2;
+global KEY_FOCUS = 0x8;
+global KEY_UP = 0x10;
+global KEY_DOWN = 0x20;
+global KEY_LEFT = 0x40;
+global KEY_RIGHT = 0x80;
+global KEY_C = 0x200;
