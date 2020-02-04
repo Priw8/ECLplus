@@ -15,5 +15,7 @@ typedef struct {
     FLOAT d;
 } MESSAGE;
 
+typedef std::list<MESSAGE*> MESSAGELIST;
+
 /* INS_2200 series: enemy communication */
 BOOL ins_2200(ENEMY enm, INSTR* ins);

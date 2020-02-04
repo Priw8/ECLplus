@@ -2,9 +2,9 @@
 #include "ins2200.h"
 #include "ECLplus.h"
 
-static std::map<DWORD, std::list<MESSAGE*>*> msgmap;
+static std::map<DWORD, MESSAGELIST*> msgmap;
 
-static VOID ChannelReset(std::list<MESSAGE*>* list) {
+static VOID ChannelReset(MESSAGELIST* list) {
     for (auto itr = list->begin(); itr != list->end(); ++itr) {
         delete *itr;
     }
@@ -31,7 +31,7 @@ static VOID MsgReset(DWORD channel) {
 
 static VOID MsgSend(DWORD channel, MESSAGE* msg) {
     if (msgmap.find(channel) == msgmap.end()) {
-        msgmap.insert({channel, new std::list<MESSAGE*>});
+        msgmap.insert({channel, new MESSAGELIST});
     }
     auto list = msgmap.at(channel);
     list->push_back(msg);
