@@ -5,6 +5,7 @@
 2002 cls
 2003 drawf
 2004 drawColor
+2005 playMusic
 
 2100 playerPos
 2101 playerKill

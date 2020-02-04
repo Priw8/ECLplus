@@ -78,6 +78,19 @@ BOOL ins_2000(ENEMY enm, INSTR* ins) {
     case INS_TEXT_COLOR:
         SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructColor, GetIntArg(enm, 0));
         break;
+    case INS_BGM_SWITCH:
+        /* Max 16 bytes because that's the max size of a name in thbgm.fmt file. */
+        strcpy_s((char*)0x00528e88, 16, GetStringArg(ins, 0));
+        /* Assembly code based on MSG ins_19, which starts boss BGM (th17.exe+2ea75). */
+        __asm {
+            push 0x004A1AE8
+            push 1
+            push 2
+            mov ecx, 0x005247F0
+            mov eax, 0x004662E0
+            call eax
+        }
+        break;
     default:
         return FALSE;
     }
