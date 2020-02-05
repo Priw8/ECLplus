@@ -45,6 +45,12 @@ BOOL ins_2100(ENEMY* enm, INSTR* ins) {
                 call eax
             }
             break;
+        case INS_PLAYER_SET_IFRAMES: {
+            LONG iframes = GetIntArg(enm, 0);
+            SetDwordField(Player, PlayerIframeIntField, iframes);
+            SetFloatField(Player, PlayerIframeFloatField, (float)iframes);
+            break;
+        }
         default:
             return FALSE;
     }

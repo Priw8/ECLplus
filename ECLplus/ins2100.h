@@ -7,7 +7,8 @@ enum INS2100 {
     INS_PLAYER_BOMB,
     INS_PLAYER_SET_LIVES,
     INS_PLAYER_SET_BOMBS,
-    INS_PLAYER_SET_POWER
+    INS_PLAYER_SET_POWER,
+    INS_PLAYER_SET_IFRAMES
 };
 
 #define PlayerPtr 0x004B77D0
@@ -15,6 +16,8 @@ enum INS2100 {
 #define PlayerXField 0x61C
 #define PlayerYField 0x620
 #define PlayerStateField 0x18DB0
+#define PlayerIframeIntField 0x18E7C
+#define PlayerIframeFloatField 0x18E80
 
 #define PlayerLivesPtr 0x004B5A40
 #define PlayerLives Deref(PlayerLivesPtr)

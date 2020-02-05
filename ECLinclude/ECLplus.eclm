@@ -13,6 +13,7 @@
 2103 playerSetLives
 2104 playerSetBombs
 2105 playerSetPower
+2106 playerSetIframes
 
 2200 msgResetAll
 2201 msgReset
@@ -41,10 +42,11 @@
 -7993 PIV
 -7992 CONTINUES
 -7991 CREDITS
--7790 GI4
--7789 GI5
--7788 GI6
--7787 GI7
+-7990 GI4
+-7989 GI5
+-7988 GI6
+-7987 GI7
+-7986 IFRAMES
 
 !gvar_types
 -8000 $
@@ -61,3 +63,4 @@
 -7989 $
 -7988 $
 -7987 $
+-7986 $
