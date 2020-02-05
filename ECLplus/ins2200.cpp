@@ -20,7 +20,7 @@ static VOID MsgReset() {
     }
 }
 
-static VOID MsgReset(DWORD channel) {
+static VOID MsgReset(LONG channel) {
     auto itr = msgmap.find(channel);
     if (itr != msgmap.end()) {
         ChannelReset(itr->second);
@@ -29,7 +29,7 @@ static VOID MsgReset(DWORD channel) {
     }
 }
 
-static VOID MsgSend(DWORD channel, MESSAGE* msg) {
+static VOID MsgSend(LONG channel, MESSAGE* msg) {
     if (msgmap.find(channel) == msgmap.end()) {
         msgmap.insert({channel, new MESSAGELIST});
     }
@@ -37,7 +37,7 @@ static VOID MsgSend(DWORD channel, MESSAGE* msg) {
     list->push_back(msg);
 }
 
-static MESSAGE* MsgReceive(DWORD channel, BOOL pop) {
+static MESSAGE* MsgReceive(LONG channel, BOOL pop) {
     auto itr = msgmap.find(channel);
     if (itr != msgmap.end()) {
         if (!itr->second->empty()) {
@@ -71,7 +71,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
         case INS_MSG_PEEK: {
             MESSAGE* msg = MsgReceive(GetIntArg(enm, 5), (ins->id - 2200) != INS_MSG_PEEK);
             
-            DWORD* ptr = GetIntArgAddr(enm, 0);
+            LONG* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) *ptr = msg == NULL ? 0 : 1;
             if (msg == NULL) break;
 
@@ -91,7 +91,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             break;
         }
         case INS_MSG_CHECK: {
-            DWORD* ptr = GetIntArgAddr(enm, 0);
+            LONG* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) *ptr = MsgReceive(GetIntArg(enm, 1), FALSE) != NULL;
             break;
         }
@@ -110,7 +110,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
                 }
                 node = node->next;
             }
-            DWORD* ptr = GetIntArgAddr(enm, 0);
+            LONG* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) {
                 if (closestEnm != NULL)
                     *ptr = closestEnm->enm.id;
@@ -128,6 +128,107 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             if (foundEnm != NULL) {
                 foundEnm->enm.pendingDmg += GetIntArg(enm, 1);
             }
+            break;
+        }
+        case INS_ENM_DAMAGE_RADIUS: {
+            FLOAT x = GetFloatArg(enm, 1), 
+                  y = GetFloatArg(enm, 2),
+                  rad = GetFloatArg(enm, 3);
+            FLOAT radSq = powf(rad, 2.0f);
+            LONG cnt = 0;
+            LONG maxcnt = GetIntArg(enm, 4);
+            LONG dmg = GetIntArg(enm, 5);
+
+            ENEMYLISTNODE* node = GameEnmMgr->head;
+            std::list<ENEMY*> enmList;
+
+            while(node != NULL) {
+                ENEMY* iterEnm = &node->obj->enm;
+                /* Hurtbox is actually a square, unlike the hitbox. */
+                /* So we have to check circle-rectangle intersection (annoying) */
+                FLOAT xDist = fabsf(x - iterEnm->pos.x);
+                FLOAT yDist = fabsf(y - iterEnm->pos.y);
+                BOOL intersects;
+                if (xDist > iterEnm->hurtbox.x / 2.0f + rad) intersects = FALSE;
+                else if (yDist > iterEnm->hurtbox.y / 2.0f + rad) intersects = FALSE;
+
+                else if (xDist <= iterEnm->hurtbox.x / 2.0f) intersects = TRUE;
+                else if (yDist <= iterEnm->hurtbox.y / 2.0f) intersects = TRUE;
+
+                else {
+                    FLOAT distSq = powf(xDist - iterEnm->hurtbox.x / 2.0f, 2.0f) + powf(yDist - iterEnm->hurtbox.y / 2.0f, 2.0f);
+                    intersects = distSq <= radSq;
+                }
+
+                if (!(iterEnm->flags & (FLAG_INTANGIBLE | FLAG_NO_HURTBOX)) && intersects) {
+                    enmList.push_front(iterEnm);
+                }
+                node = node->next;
+            }
+
+            enmList.sort([x, y](ENEMY* enm1, ENEMY* enm2) {
+                return 
+                    powf(enm1->pos.x - x, 2) + powf(enm1->pos.y - y, 2)
+                    <
+                    powf(enm2->pos.x - x, 2) + powf(enm2->pos.y - y, 2);
+            });
+
+            for (auto itr = enmList.begin(); itr != enmList.end(); ++itr) {
+                if (maxcnt > 0 && cnt >= maxcnt)
+                    break;
+                (*itr)->pendingDmg += dmg;
+                ++cnt;
+            }
+
+            LONG* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) *ptr = cnt;
+
+            break;
+        }
+        case INS_ENM_DAMAGE_RECT: {
+            FLOAT x = GetFloatArg(enm, 1),
+                  y = GetFloatArg(enm, 2),
+                  w = GetFloatArg(enm, 3),
+                  h = GetFloatArg(enm, 4);
+
+            LONG cnt = 0;
+            LONG maxcnt = GetIntArg(enm, 5);
+            LONG dmg = GetIntArg(enm, 6);
+
+            ENEMYLISTNODE* node = GameEnmMgr->head;
+            std::list<ENEMY*> enmList;
+
+            while (node != NULL) {
+                ENEMY* iterEnm = &node->obj->enm;
+                if (
+                    !(iterEnm->flags & (FLAG_INTANGIBLE | FLAG_NO_HURTBOX)) &&
+                    x - w / 2.0f < iterEnm->pos.x + iterEnm->hurtbox.x / 2.0f &&
+                    x + w / 2.0f > iterEnm->pos.x - iterEnm->hurtbox.x / 2.0f &&
+                    y - h / 2.0f < iterEnm->pos.y + iterEnm->hurtbox.y / 2.0f &&
+                    y + h / 2.0f > iterEnm->pos.y - iterEnm->hurtbox.y / 2.0f
+                ) {
+                    enmList.push_front(iterEnm);
+                }
+                node = node->next;
+            }
+
+            enmList.sort([x, y](ENEMY* enm1, ENEMY* enm2) {
+                return
+                    powf(enm1->pos.x - x, 2) + powf(enm1->pos.y - y, 2)
+                    <
+                    powf(enm2->pos.x - x, 2) + powf(enm2->pos.y - y, 2);
+            });
+
+            for (auto itr = enmList.begin(); itr != enmList.end(); ++itr) {
+                if (maxcnt > 0 && cnt >= maxcnt)
+                    break;
+                (*itr)->pendingDmg += dmg;
+                ++cnt;
+            }
+
+            LONG* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) *ptr = cnt;
+
             break;
         }
         default:

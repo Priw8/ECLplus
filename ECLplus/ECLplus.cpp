@@ -33,9 +33,9 @@ static DWORD __stdcall IntVarSwitch(ENEMY* enm, DWORD var, DWORD type) {
         return (DWORD)IntVarGetAddr(enm, var);
 }
 
-DWORD GetIntArg(ENEMY* enm, DWORD n) {
+LONG GetIntArg(ENEMY* enm, DWORD n) {
     /* Calling the __thiscall requires assembly */
-    DWORD res;
+    LONG res;
     __asm {
         mov ecx, enm
         push n
@@ -46,8 +46,8 @@ DWORD GetIntArg(ENEMY* enm, DWORD n) {
     return res;
 }
 
-DWORD GetIntArgEx(ENEMY* enm, DWORD n, DWORD val) {
-    DWORD res;
+LONG GetIntArgEx(ENEMY* enm, DWORD n, DWORD val) {
+    LONG res;
     _asm {
         mov ecx, enm
         push val
@@ -88,8 +88,8 @@ const CHAR* GetStringArg(INSTR* ins, DWORD n) {
     return (const CHAR*) &(ins->data[n * 4 + 4]);
 }
 
-DWORD* GetIntArgAddr(ENEMY* enm, DWORD n) {
-    DWORD* res;
+LONG* GetIntArgAddr(ENEMY* enm, DWORD n) {
+    LONG* res;
     __asm {
         mov ecx, enm
         push n

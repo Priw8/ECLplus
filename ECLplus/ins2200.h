@@ -10,7 +10,9 @@ enum INS2200 {
     INS_MSG_CHECK,
     /* Reserving some instr IDs for possible MSG ins additions */
     INS_GET_CLOSEST_ENM = 10,
-    INS_ENM_DAMAGE
+    INS_ENM_DAMAGE,
+    INS_ENM_DAMAGE_RADIUS,
+    INS_ENM_DAMAGE_RECT
 };
 
 typedef struct {

@@ -64,7 +64,11 @@ typedef struct ENEMY {
     CHAR pad0[0x44];
     POINTFLOAT pos;
 
-    #define lpad1 (sizeof(pad0) + sizeof(pos))
+    #define lpadHurtbox (sizeof(pad0) + sizeof(pos))
+    CHAR padHurtbox[0x110 - lpadHurtbox];
+    POINTFLOAT hurtbox;
+
+    #define lpad1 (lpadHurtbox + sizeof(padHurtbox) + sizeof(hurtbox))
     CHAR pad1[0x3F54 - lpad1];
     LONG pendingDmg;
 
@@ -147,12 +151,12 @@ typedef double DOUBLE;
 VOID init();
 
 /* Returns the nth ECL argument as an integer. */
-DWORD GetIntArg(ENEMY* enm, DWORD n);
+LONG GetIntArg(ENEMY* enm, DWORD n);
 
 /* Returns the nth ECL argument as an integer. Does not read the raw value
  * from the instruction, but from the given value. The game will read it as
  * variable if necessary, based on paramMask of the current instruction. */
-DWORD GetIntArgEx(ENEMY* enm, DWORD n, DWORD val);
+LONG GetIntArgEx(ENEMY* enm, DWORD n, DWORD val);
 
 /* Returns the nth ECL argument as a float. */
 FLOAT GetFloatArg(ENEMY* enm, DWORD n);
@@ -170,7 +174,7 @@ const CHAR* GetStringArg(INSTR* ins, DWORD n);
 /* Returns a pointer to the int variable passed as the nth argument.
  * NOTE: only works for n=0 because of optimizations MSVC did on WBaWC 
  * (game only ever calls this with n=0) */
-DWORD* GetIntArgAddr(ENEMY* enm, DWORD n);
+LONG* GetIntArgAddr(ENEMY* enm, DWORD n);
 
 /* Returns a pointer to the float variable passed as the nth argument. */
 FLOAT* GetFloatArgAddr(ENEMY* enm, DWORD n);

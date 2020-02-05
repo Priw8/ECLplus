@@ -6,7 +6,7 @@ static DWORD EclArgList(CHAR* args, ENEMY* enm, INSTR* ins, PARAMD* D, DWORD i) 
     DWORD ind = 0;
     for (i; i < ins->paramCount; ++i) {
         DOUBLE* farg = (DOUBLE*)&args[ind];
-        DWORD* iarg = (DWORD*)&args[ind];
+        LONG* iarg = (LONG*)&args[ind];
         if (D->typeFrom == 'f') {
             FLOAT val = GetFloatArgEx(enm, i, D->val.f);
             if (D->typeTo == 'f') {
@@ -14,12 +14,12 @@ static DWORD EclArgList(CHAR* args, ENEMY* enm, INSTR* ins, PARAMD* D, DWORD i) 
                 ind += 8;
             }
             else if (D->typeTo == 'i') {
-                *iarg = (DWORD)val;
+                *iarg = (LONG)val;
                 ind += 4;
             }
         }
         else if (D->typeFrom == 'i') {
-            DWORD val = GetIntArgEx(enm, i, D->val.S);
+            LONG val = GetIntArgEx(enm, i, D->val.S);
             if (D->typeTo == 'f') {
                 *farg = (DOUBLE)val;
                 ind += 8;

@@ -23,6 +23,8 @@
 
 2210 enmClosest
 2211 enmDamage
+2212 enmDamageRad
+2213 enmDamageRect
 
 !gvar_names
 -8000 INPUT
