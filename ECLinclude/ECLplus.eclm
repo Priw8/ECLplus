@@ -25,6 +25,8 @@
 2211 enmDamage
 2212 enmDamageRad
 2213 enmDamageRect
+2214 enmIterate
+2215 enmIdFromIter
 
 !gvar_names
 -8000 INPUT

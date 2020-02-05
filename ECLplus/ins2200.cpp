@@ -231,6 +231,29 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
 
             break;
         }
+        case INS_ENM_ITERATOR: {
+            LONG* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) {
+                ENEMYLISTNODE* prev = (ENEMYLISTNODE*)GetIntArg(enm, 1), *next;
+                if (prev == NULL)
+                    next = GameEnmMgr->head;
+                else
+                    next = prev->next;
+                *ptr = (LONG)next;
+            }
+            break;
+        }
+        case INS_ENM_ID_FROM_ITER: {
+            LONG* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) {
+                ENEMYLISTNODE* node = (ENEMYLISTNODE*)GetIntArg(enm, 1);
+                if (node == NULL)
+                    *ptr = 0;
+                else
+                    *ptr = node->obj->enm.id;
+            }
+            break;
+        }
         default:
             return FALSE;
     }

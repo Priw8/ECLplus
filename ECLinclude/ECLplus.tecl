@@ -24,6 +24,8 @@
 #ins "2211 SS"
 #ins "2212 SfffSS"
 #ins "2213 SffffSS"
+#ins "2214 SS"
+#ins "2215 SS"
 
 inline void msgWait(int channel) {
 	int received = false;
