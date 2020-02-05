@@ -254,6 +254,28 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             }
             break;
         }
+        case INS_ENM_FLAGS: {
+            LONG* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) {
+                ENEMY* nenm = &GetEnmById(GetIntArg(enm, 1))->enm;
+                if (nenm != NULL)
+                    *ptr = nenm->flags;
+                else
+                    *ptr = 0;
+            }
+            break;
+        }
+        case INS_ENM_HP: {
+            LONG* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) {
+                ENEMY* nenm = &GetEnmById(GetIntArg(enm, 1))->enm;
+                if (nenm != NULL)
+                    *ptr = nenm->hp;
+                else
+                    *ptr = 0;
+            }
+            break;
+        }
         default:
             return FALSE;
     }
