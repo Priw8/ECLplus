@@ -59,7 +59,54 @@ typedef struct {
     DWORD codelen;
 } BINHACK;
 
-typedef LPVOID ENEMY;
+#pragma pack(push, 1)
+typedef struct ENEMY {
+    CHAR pad0[0x44];
+    POINTFLOAT pos;
+
+    #define lpad1 (sizeof(pad0) + sizeof(pos))
+    CHAR pad1[0x3F54 - lpad1];
+    LONG pendingDmg;
+
+    #define lpad2 (lpad1 + sizeof(pad1) + sizeof(pendingDmg))
+    CHAR pad2[0x3F74 - lpad2];
+    LONG hp;
+    LONG hpMax;
+    LONG hpTreshold;
+
+    #define lpad3 (lpad2 + sizeof(pad2) + sizeof(hp) + sizeof(hpMax) + sizeof(hpTreshold))
+    CHAR pad3[0x4080 - lpad3];
+    DWORD flags;
+
+    #define lpad4 (lpad3 + sizeof(pad3) + sizeof(flags))
+    CHAR pad4[0x4554 - lpad4];
+    DWORD id;
+} ENEMY;
+#pragma pack(pop)
+
+/* I think there is some baseObj class that enemy class is derived from. ENEMYFULL represents the full
+ * enemy class including the baseObj, while ENEMY is just the enemy without the base class.  */
+#pragma pack(push, 1)
+typedef struct ENEMYFULL {
+    CHAR pad[0x120C];
+    ENEMY enm;
+} ENEMYFULL;
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+typedef struct ENEMYLISTNODE {
+    ENEMYFULL* obj;
+    ENEMYLISTNODE* next;
+} ENEMYLISTNODE;
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+typedef struct ENEMYMGR {
+    CHAR pad1[0x180];
+    ENEMYLISTNODE* head;
+} ENEMYMGR;
+#pragma pack(pop)
+
 typedef double DOUBLE;
 
 #define SetDwordField(ptr,off,val) (*((DWORD*)(ptr + off)) = val)
@@ -67,6 +114,8 @@ typedef double DOUBLE;
 #define GetDwordField(ptr,off) (*((DWORD*)(ptr + off)))
 #define GetFloatField(ptr,off) (*((FLOAT*)(ptr + off)))
 #define Deref(x) (*(DWORD*)x)
+
+#define GameEnmMgr ((ENEMYMGR*)Deref(0x004B76A0))
 
 #define EXPORT_LOC ((LPVOID)0x00499FE8)
 #define CODECAVE_LOC ((LPVOID)0x00499EBA)
@@ -77,6 +126,9 @@ typedef double DOUBLE;
 #define CODECAVE_INTVARGET_LOC ((LPVOID)0x00499ECA)
 #define INTVARADDR_HANDLER_LOC ((LPVOID)0x00427Cf1)
 #define CODECAVE_INTVARADDR_LOC ((LPVOID)0x00499EDB)
+
+#define CODECAVE_ENMDMG_LOC ((LPVOID)0x00499EEE)
+#define CODECAVE_ENMDMG_JUMP_LOC ((LPVOID)0x0041FA15)
 
 #define GameGetIntArg 0x00428CC0
 #define GameGetFloatArg 0x00428CF0
@@ -95,20 +147,20 @@ typedef double DOUBLE;
 VOID init();
 
 /* Returns the nth ECL argument as an integer. */
-DWORD GetIntArg(ENEMY enm, DWORD n);
+DWORD GetIntArg(ENEMY* enm, DWORD n);
 
 /* Returns the nth ECL argument as an integer. Does not read the raw value
  * from the instruction, but from the given value. The game will read it as
  * variable if necessary, based on paramMask of the current instruction. */
-DWORD GetIntArgEx(ENEMY enm, DWORD n, DWORD val);
+DWORD GetIntArgEx(ENEMY* enm, DWORD n, DWORD val);
 
 /* Returns the nth ECL argument as a float. */
-FLOAT GetFloatArg(ENEMY enm, DWORD n);
+FLOAT GetFloatArg(ENEMY* enm, DWORD n);
 
 /* Returns the nth ECL argument as a float. Does not read the raw value
  * from the instruction, but from the given value. The game will read it as
  * variable if necessary, based on paramMask of the current instruction. */
-FLOAT GetFloatArgEx(ENEMY enm, DWORD n, FLOAT val);
+FLOAT GetFloatArgEx(ENEMY* enm, DWORD n, FLOAT val);
 
 /* Returns a pointer to the ECL string argument
    which is the nth arg. Assumes that there are
@@ -118,10 +170,10 @@ const CHAR* GetStringArg(INSTR* ins, DWORD n);
 /* Returns a pointer to the int variable passed as the nth argument.
  * NOTE: only works for n=0 because of optimizations MSVC did on WBaWC 
  * (game only ever calls this with n=0) */
-DWORD* GetIntArgAddr(ENEMY enm, DWORD n);
+DWORD* GetIntArgAddr(ENEMY* enm, DWORD n);
 
 /* Returns a pointer to the float variable passed as the nth argument. */
-FLOAT* GetFloatArgAddr(ENEMY enm, DWORD n);
+FLOAT* GetFloatArgAddr(ENEMY* enm, DWORD n);
 
 /* Shows a message box of the given content, */
 inline VOID EclMsg(CONST CHAR* str) {
@@ -170,3 +222,18 @@ inline VOID EclPrintRender(FLOAT x, FLOAT y, CONST CHAR* format, DWORD len, CHAR
         add esp, len
     }
 }
+
+/* Enemy flags */
+#define FLAG_NO_HURTBOX 1
+#define FLAG_NO_HITBOX 2
+#define FLAG_OFFSCREEN_LR 4
+#define FLAG_OFFSCREEN_UD 8
+#define FLAG_INVINCIBLE 16
+#define FLAG_INTANGIBLE 32
+/* flag 64 is unknown */
+#define FLAG_NO_DELETE 128
+#define FLAG_ALWAYS_DELETE 256
+#define FLAG_GRAZE 512
+#define FLAG_ONLY_DIALOG_DELETE 1024
+#define FLAG_ETCLEAR_DIE 2048
+#define FLAG_RECT_HITBOX 4096

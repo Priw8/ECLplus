@@ -50,7 +50,7 @@ static MESSAGE* MsgReceive(DWORD channel, BOOL pop) {
     return NULL;
 }
 
-BOOL ins_2200(ENEMY enm, INSTR* ins) {
+BOOL ins_2200(ENEMY* enm, INSTR* ins) {
     switch (ins->id - 2200) {
         case INS_MSG_RESET:
             MsgReset();
@@ -93,6 +93,41 @@ BOOL ins_2200(ENEMY enm, INSTR* ins) {
         case INS_MSG_CHECK: {
             DWORD* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) *ptr = MsgReceive(GetIntArg(enm, 1), FALSE) != NULL;
+            break;
+        }
+        case INS_GET_CLOSEST_ENM: {
+            FLOAT x = GetFloatArg(enm, 2), y = GetFloatArg(enm, 3);
+            ENEMYLISTNODE* node = GameEnmMgr->head;
+            ENEMYFULL* closestEnm = NULL;
+            FLOAT closest = INFINITY;
+            while(node != NULL) {
+                if (!(node->obj->enm.flags & (FLAG_INTANGIBLE | FLAG_NO_HURTBOX))) {
+                    FLOAT dist = powf(node->obj->enm.pos.x - x, 2) + powf(node->obj->enm.pos.y - y, 2);
+                    if (dist < closest) {
+                        closestEnm = node->obj;
+                        closest = dist;
+                    }
+                }
+                node = node->next;
+            }
+            DWORD* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) {
+                if (closestEnm != NULL)
+                    *ptr = closestEnm->enm.id;
+                else
+                    *ptr = 0;
+            }
+            FLOAT* fptr = GetFloatArgAddr(enm, 1);
+            if (fptr != NULL) {
+                *fptr = sqrtf(closest);
+            }
+            break;
+        }
+        case INS_ENM_DAMAGE: {
+            ENEMYFULL* foundEnm = GetEnmById(GetIntArg(enm, 0));
+            if (foundEnm != NULL) {
+                foundEnm->enm.pendingDmg += GetIntArg(enm, 1);
+            }
             break;
         }
         default:

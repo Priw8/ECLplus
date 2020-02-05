@@ -23,6 +23,6 @@ enum {
 #define INTVAR_CONTINUES_LOC (DWORD*)0x004B5A04
 #define INTVAR_CREDITS_LOC (DWORD*)0x004B59D0
 
-DWORD IntVarGetVal(ENEMY enm, DWORD var);
+DWORD IntVarGetVal(ENEMY* enm, DWORD var);
 
-DWORD* IntVarGetAddr(ENEMY enm, DWORD var);
+DWORD* IntVarGetAddr(ENEMY* enm, DWORD var);

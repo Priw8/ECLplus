@@ -26,4 +26,4 @@ enum INS2100 {
 #define PlayerPower Deref(PlayerPowerPtr)
 
 /* INS_2100 series: player manipulation */
-BOOL ins_2100(ENEMY enm, INSTR* ins);
+BOOL ins_2100(ENEMY* enm, INSTR* ins);

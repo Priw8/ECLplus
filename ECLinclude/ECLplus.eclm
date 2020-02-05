@@ -21,6 +21,9 @@
 2204 msgPeek
 2205 msgCheck
 
+2210 enmClosest
+2211 enmDamage
+
 !gvar_names
 -8000 INPUT
 -7999 SCORE

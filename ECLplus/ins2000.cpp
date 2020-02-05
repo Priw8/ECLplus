@@ -2,7 +2,7 @@
 #include "ins2000.h"
 #include "ECLplus.h"
 
-static DWORD EclArgList(CHAR* args, ENEMY enm, INSTR* ins, PARAMD* D, DWORD i) {
+static DWORD EclArgList(CHAR* args, ENEMY* enm, INSTR* ins, PARAMD* D, DWORD i) {
     DWORD ind = 0;
     for (i; i < ins->paramCount; ++i) {
         DOUBLE* farg = (DOUBLE*)&args[ind];
@@ -34,7 +34,7 @@ static DWORD EclArgList(CHAR* args, ENEMY enm, INSTR* ins, PARAMD* D, DWORD i) {
     return ind;
 }
 
-static VOID EclPrintf(CHAR* buf, DWORD bufSize, INSTR* ins, ENEMY enm) {
+static VOID EclPrintf(CHAR* buf, DWORD bufSize, INSTR* ins, ENEMY* enm) {
     CONST CHAR* str = GetStringArg(ins, 0);
     DWORD size = *(DWORD*)(&ins->data[0]); /* this includes padding (its purpose is keeping the rest of the params aligned) */
     PARAMD* D = (PARAMD*)&ins->data[size + 4]; /* +4 to include the size param */
@@ -45,7 +45,7 @@ static VOID EclPrintf(CHAR* buf, DWORD bufSize, INSTR* ins, ENEMY enm) {
     vsnprintf(buf, bufSize, str, (va_list)args);
 }
 
-BOOL ins_2000(ENEMY enm, INSTR* ins) {
+BOOL ins_2000(ENEMY* enm, INSTR* ins) {
     CHAR buf[512];
     switch (ins->id - 2000) {
     case INS_MSG_BOX:

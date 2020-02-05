@@ -6,7 +6,7 @@
 #include "intvar.h"
 
 /* Executes an extra ECL instruction, called by the modified game. */
-static VOID __stdcall InsSwitch(ENEMY enm, INSTR* ins) {
+static VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
     CHAR buf[256];
     BOOL success;
     if (ins->id >= 2000 && ins->id < 2100) {
@@ -26,14 +26,14 @@ static VOID __stdcall InsSwitch(ENEMY enm, INSTR* ins) {
     }
 }
 
-static DWORD __stdcall IntVarSwitch(ENEMY enm, DWORD var, DWORD type) {
+static DWORD __stdcall IntVarSwitch(ENEMY* enm, DWORD var, DWORD type) {
     if (type == 0)
         return IntVarGetVal(enm, var);
     else
         return (DWORD)IntVarGetAddr(enm, var);
 }
 
-DWORD GetIntArg(ENEMY enm, DWORD n) {
+DWORD GetIntArg(ENEMY* enm, DWORD n) {
     /* Calling the __thiscall requires assembly */
     DWORD res;
     __asm {
@@ -46,7 +46,7 @@ DWORD GetIntArg(ENEMY enm, DWORD n) {
     return res;
 }
 
-DWORD GetIntArgEx(ENEMY enm, DWORD n, DWORD val) {
+DWORD GetIntArgEx(ENEMY* enm, DWORD n, DWORD val) {
     DWORD res;
     _asm {
         mov ecx, enm
@@ -59,7 +59,7 @@ DWORD GetIntArgEx(ENEMY enm, DWORD n, DWORD val) {
     return res;
 }
 
-FLOAT GetFloatArg(ENEMY enm, DWORD n) {
+FLOAT GetFloatArg(ENEMY* enm, DWORD n) {
     FLOAT res;
     __asm {
         mov ecx, enm
@@ -71,7 +71,7 @@ FLOAT GetFloatArg(ENEMY enm, DWORD n) {
     return res;
 }
 
-FLOAT GetFloatArgEx(ENEMY enm, DWORD n, FLOAT val) {
+FLOAT GetFloatArgEx(ENEMY* enm, DWORD n, FLOAT val) {
     FLOAT res;
     __asm {
         mov ecx, enm
@@ -88,7 +88,7 @@ const CHAR* GetStringArg(INSTR* ins, DWORD n) {
     return (const CHAR*) &(ins->data[n * 4 + 4]);
 }
 
-DWORD* GetIntArgAddr(ENEMY enm, DWORD n) {
+DWORD* GetIntArgAddr(ENEMY* enm, DWORD n) {
     DWORD* res;
     __asm {
         mov ecx, enm
@@ -100,7 +100,7 @@ DWORD* GetIntArgAddr(ENEMY enm, DWORD n) {
     return res;
 }
 
-FLOAT* GetFloatArgAddr(ENEMY enm, DWORD n) {
+FLOAT* GetFloatArgAddr(ENEMY* enm, DWORD n) {
     FLOAT* res;
     __asm {
         mov ecx, enm
@@ -132,6 +132,9 @@ static CONST UCHAR binhackIntVarJump[] = { 0x0F, 0x87, 0xA0, 0x29, 0x07, 0x00 };
 static CONST UCHAR binhackIntVarAddr[] = { 0x6A, 0x01, 0x52, 0x83, 0xC0, 0x0F, 0x50, 0xA1, 0xE4, 0x9F, 0x49, 0x00, 0xFF, 0xD0, 0x5E, 0x5D, 0xC2, 0x04, 0x00 };
 static CONST UCHAR binhackIntVarAddrJump[] = { 0x0F, 0x87, 0xE4, 0x21, 0x07, 0x00 };
 
+static CONST UCHAR binhackEnmDamage[] = { 0xE8, 0x9D, 0x11, 0xFB, 0xFF, 0x03, 0x83, 0x54, 0x3F, 0x00, 0x00, 0xC7, 0x83, 0x54, 0x3F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xBE, 0x1A, 0xFA, 0x41, 0x00, 0xFF, 0xE6 };
+static CONST UCHAR binhackEnmDamageJump[] = { 0xE9, 0xD4, 0xA4, 0x07, 0x00 };
+
 CONST BINHACK binhacks[] = {
     {
         CODECAVE_LOC,
@@ -162,6 +165,16 @@ CONST BINHACK binhacks[] = {
         INTVARADDR_HANDLER_LOC,
         binhackIntVarAddrJump,
         sizeof(binhackIntVarAddrJump)
+    },
+    {
+        CODECAVE_ENMDMG_LOC,
+        binhackEnmDamage,
+        sizeof(binhackEnmDamage)
+    },
+    {
+        CODECAVE_ENMDMG_JUMP_LOC,
+        binhackEnmDamageJump,
+        sizeof(binhackEnmDamageJump)
     }
 };
 

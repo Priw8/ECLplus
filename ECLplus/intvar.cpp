@@ -2,7 +2,7 @@
 #include "intvar.h"
 #include "ins2100.h"
 
-DWORD IntVarGetVal(ENEMY enm, DWORD var) {
+DWORD IntVarGetVal(ENEMY* enm, DWORD var) {
     switch(var + 8000) {
         case INTVAR_INPUT:
             return *INTVAR_INPUT_LOC;
@@ -30,7 +30,7 @@ DWORD IntVarGetVal(ENEMY enm, DWORD var) {
 }
 
 static DWORD invalidAddr; /* Return a pointer to a valid variable to avoid crashing the game. */
-DWORD* IntVarGetAddr(ENEMY enm, DWORD var) {
+DWORD* IntVarGetAddr(ENEMY* enm, DWORD var) {
     switch (var + 8000) {
         case INTVAR_INPUT:
             return INTVAR_INPUT_LOC;
