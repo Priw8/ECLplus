@@ -51,6 +51,28 @@ BOOL ins_2100(ENEMY* enm, INSTR* ins) {
             SetFloatField(Player, PlayerIframeFloatField, (float)iframes);
             break;
         }
+        case INS_PLAYER_TOGGLE_SHOT: {
+            DWORD old;
+            VirtualProtect((LPVOID)0x0044ABF5, 1, PAGE_READWRITE, &old);
+            *(BYTE*)0x0044ABF5 = GetIntArg(enm, 0) ? 1 : 0;
+            VirtualProtect((LPVOID)0x0044ABF5, 1, old, &old);
+
+            VirtualProtect((LPVOID)0x0044AC4D, 1, PAGE_READWRITE, &old);
+            *(BYTE*)0x0044AC4D = GetIntArg(enm, 0) ? 1 : 0;
+            VirtualProtect((LPVOID)0x0044AC4D, 1, old, &old);
+
+            VirtualProtect((LPVOID)0x0044ACAC, 1, PAGE_READWRITE, &old);
+            *(BYTE*)0x0044ACAC = GetIntArg(enm, 0) ? 1 : 0;
+            VirtualProtect((LPVOID)0x0044ACAC, 1, old, &old);
+            break;
+        }
+        case INS_PLAYER_TOGGLE_BOMB: {
+            DWORD old;
+            VirtualProtect((LPVOID)0x00447B3E, 1, PAGE_READWRITE, &old);
+            *(BYTE*)0x00447B3E = GetIntArg(enm, 0) ? 0x00 : 0x7F;
+            VirtualProtect((LPVOID)0x00447B3E, 1, old, &old);
+            break;
+        }
         default:
             return FALSE;
     }

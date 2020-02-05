@@ -13,6 +13,8 @@
 #ins "2104 S"
 #ins "2105 S"
 #ins "2106 S"
+#ins "2107 S"
+#ins "2108 S"
 
 #ins "2200"
 #ins "2201 S"
@@ -38,6 +40,16 @@ LOOP:
 BEGIN:
 	msgCheck(received, channel);
 	unless (received) goto LOOP;
+}
+
+inline void ECLplusReset() {
+	msgResetAll();
+	playerAllowShot(1);
+	playerAllowBomb(1);
+	GI4 = 0;
+	GI5 = 0;
+	GI6 = 0;
+	GI7 = 0;
 }
 
 global KEY_SHOOT = 0x1;
