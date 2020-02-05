@@ -2,6 +2,9 @@
 #include "intvar.h"
 #include "ins2100.h"
 
+/* Extra global integer variables */
+static DWORD GI[4] = {0, 0, 0, 0};
+
 DWORD IntVarGetVal(ENEMY* enm, DWORD var) {
     switch(var + 8000) {
         case INTVAR_INPUT:
@@ -24,6 +27,11 @@ DWORD IntVarGetVal(ENEMY* enm, DWORD var) {
             return *INTVAR_CONTINUES_LOC;
         case INTVAR_CREDITS:
             return *INTVAR_CREDITS_LOC;
+        case INTVAR_GI4:
+        case INTVAR_GI5:
+        case INTVAR_GI6:
+        case INTVAR_GI7:
+            return GI[var + 8000 - INTVAR_GI4];
         default:
             return 0;
     }
@@ -56,6 +64,11 @@ DWORD* IntVarGetAddr(ENEMY* enm, DWORD var) {
             return INTVAR_CONTINUES_LOC;
         case INTVAR_CREDITS:
             return INTVAR_CREDITS_LOC;
+        case INTVAR_GI4:
+        case INTVAR_GI5:
+        case INTVAR_GI6:
+        case INTVAR_GI7:
+            return &GI[var + 8000 - INTVAR_GI4];
         default:
             return &invalidAddr;
     }
