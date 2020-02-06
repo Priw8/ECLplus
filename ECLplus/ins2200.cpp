@@ -207,7 +207,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             LONG dmg = GetIntArg(enm, 6);
 
             ENEMYLISTNODE* node = GameEnmMgr->head;
-            DWORD i;
+            DWORD i = 0;
 
             while (node != NULL) {
                 ENEMY* iterEnm = &node->obj->enm;
