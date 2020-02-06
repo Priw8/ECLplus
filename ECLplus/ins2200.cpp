@@ -4,6 +4,8 @@
 
 static std::map<DWORD, MESSAGELIST*> msgmap;
 
+static std::array<ENEMY*, 2000> enmArr;
+
 static VOID ChannelReset(MESSAGELIST* list) {
     for (auto itr = list->begin(); itr != list->end(); ++itr) {
         delete *itr;
@@ -140,43 +142,47 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             LONG dmg = GetIntArg(enm, 5);
 
             ENEMYLISTNODE* node = GameEnmMgr->head;
-            std::list<ENEMY*> enmList;
+            DWORD i = 0;
 
             while(node != NULL) {
                 ENEMY* iterEnm = &node->obj->enm;
-                /* Hurtbox is actually a square, unlike the hitbox. */
-                /* So we have to check circle-rectangle intersection (annoying) */
-                FLOAT xDist = fabsf(x - iterEnm->pos.x);
-                FLOAT yDist = fabsf(y - iterEnm->pos.y);
-                BOOL intersects;
-                if (xDist > iterEnm->hurtbox.x / 2.0f + rad) intersects = FALSE;
-                else if (yDist > iterEnm->hurtbox.y / 2.0f + rad) intersects = FALSE;
+                if (!(iterEnm->flags & (FLAG_INTANGIBLE | FLAG_NO_HURTBOX))) {
+                    /* Hurtbox is actually a square, unlike the hitbox. */
+                    /* So we have to check circle-rectangle intersection (annoying) */
+                    FLOAT xDist = fabsf(x - iterEnm->pos.x);
+                    FLOAT yDist = fabsf(y - iterEnm->pos.y);
+                    BOOL intersects;
+                    if (xDist > iterEnm->hurtbox.x / 2.0f + rad) intersects = FALSE;
+                    else if (yDist > iterEnm->hurtbox.y / 2.0f + rad) intersects = FALSE;
 
-                else if (xDist <= iterEnm->hurtbox.x / 2.0f) intersects = TRUE;
-                else if (yDist <= iterEnm->hurtbox.y / 2.0f) intersects = TRUE;
+                    else if (xDist <= iterEnm->hurtbox.x / 2.0f) intersects = TRUE;
+                    else if (yDist <= iterEnm->hurtbox.y / 2.0f) intersects = TRUE;
 
-                else {
-                    FLOAT distSq = powf(xDist - iterEnm->hurtbox.x / 2.0f, 2.0f) + powf(yDist - iterEnm->hurtbox.y / 2.0f, 2.0f);
-                    intersects = distSq <= radSq;
-                }
+                    else {
+                        FLOAT distSq = powf(xDist - iterEnm->hurtbox.x / 2.0f, 2.0f) + powf(yDist - iterEnm->hurtbox.y / 2.0f, 2.0f);
+                        intersects = distSq <= radSq;
+                    }
 
-                if (!(iterEnm->flags & (FLAG_INTANGIBLE | FLAG_NO_HURTBOX)) && intersects) {
-                    enmList.push_front(iterEnm);
+                    if (intersects) {
+                        enmArr[i] = iterEnm;
+                        ++i;
+                    }
                 }
                 node = node->next;
             }
 
-            enmList.sort([x, y](ENEMY* enm1, ENEMY* enm2) {
-                return 
+            std::sort(enmArr.begin(), enmArr.begin() + i, [x, y](ENEMY* enm1, ENEMY* enm2) {
+                return
                     powf(enm1->pos.x - x, 2) + powf(enm1->pos.y - y, 2)
                     <
                     powf(enm2->pos.x - x, 2) + powf(enm2->pos.y - y, 2);
             });
 
-            for (auto itr = enmList.begin(); itr != enmList.end(); ++itr) {
+
+            for (DWORD itr = 0; itr < i; ++itr) {
                 if (maxcnt > 0 && cnt >= maxcnt)
                     break;
-                (*itr)->pendingDmg += dmg;
+                enmArr[itr]->pendingDmg += dmg;
                 ++cnt;
             }
 
@@ -196,7 +202,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             LONG dmg = GetIntArg(enm, 6);
 
             ENEMYLISTNODE* node = GameEnmMgr->head;
-            std::list<ENEMY*> enmList;
+            DWORD i;
 
             while (node != NULL) {
                 ENEMY* iterEnm = &node->obj->enm;
@@ -207,22 +213,23 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
                     y - h / 2.0f < iterEnm->pos.y + iterEnm->hurtbox.y / 2.0f &&
                     y + h / 2.0f > iterEnm->pos.y - iterEnm->hurtbox.y / 2.0f
                 ) {
-                    enmList.push_front(iterEnm);
+                    enmArr[i] = iterEnm;
+                    ++i;
                 }
                 node = node->next;
             }
 
-            enmList.sort([x, y](ENEMY* enm1, ENEMY* enm2) {
+            std::sort(enmArr.begin(), enmArr.begin() + i, [x, y](ENEMY* enm1, ENEMY* enm2) {
                 return
                     powf(enm1->pos.x - x, 2) + powf(enm1->pos.y - y, 2)
                     <
                     powf(enm2->pos.x - x, 2) + powf(enm2->pos.y - y, 2);
             });
 
-            for (auto itr = enmList.begin(); itr != enmList.end(); ++itr) {
+            for (DWORD itr = 0; itr < i; ++itr) {
                 if (maxcnt > 0 && cnt >= maxcnt)
                     break;
-                (*itr)->pendingDmg += dmg;
+                enmArr[itr]->pendingDmg += dmg;
                 ++cnt;
             }
 

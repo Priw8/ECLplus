@@ -12,6 +12,8 @@
 #include <stdarg.h>
 #include <map>
 #include <list>
+#include <array>
+#include <algorithm>
 #include <windows.h>
 
 #endif //PCH_H
