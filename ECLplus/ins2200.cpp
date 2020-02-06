@@ -4,7 +4,8 @@
 
 static std::map<DWORD, MESSAGELIST*> msgmap;
 
-static std::array<ENEMY*, 2000> enmArr;
+#define ENMARR_LEN 2000
+static std::array<ENEMY*, ENMARR_LEN> enmArr;
 
 static VOID ChannelReset(MESSAGELIST* list) {
     for (auto itr = list->begin(); itr != list->end(); ++itr) {
@@ -166,6 +167,10 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
                     if (intersects) {
                         enmArr[i] = iterEnm;
                         ++i;
+                        if (i == ENMARR_LEN) {
+                            EclMsg("enmDamageRad: ran out of space for enemies in the preallocated buffer. Why are you using over 2000 real enemies?");
+                            return TRUE;
+                        }
                     }
                 }
                 node = node->next;
@@ -215,6 +220,10 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
                 ) {
                     enmArr[i] = iterEnm;
                     ++i;
+                    if (i == ENMARR_LEN) {
+                        EclMsg("enmDamageRect: ran out of space for enemies in the preallocated buffer. Why are you using over 2000 real enemies?");
+                        return TRUE;
+                    }
                 }
                 node = node->next;
             }
