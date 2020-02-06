@@ -60,3 +60,8 @@ global KEY_DOWN = 0x20;
 global KEY_LEFT = 0x40;
 global KEY_RIGHT = 0x80;
 global KEY_C = 0x200;
+
+global PL_DYING = 4;
+global PL_DEAD = 2;
+global PL_NORMAL = 1;
+global PL_RESPAWN = 0;

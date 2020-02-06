@@ -71,6 +71,10 @@ BOOL ins_2100(ENEMY* enm, INSTR* ins) {
             VirtualProtect((LPVOID)0x00447B3E, 1, PAGE_READWRITE, &old);
             *(BYTE*)0x00447B3E = GetIntArg(enm, 0) ? 0x00 : 0x7F;
             VirtualProtect((LPVOID)0x00447B3E, 1, old, &old);
+
+            VirtualProtect((LPVOID)0x00447C2C, 1, PAGE_READWRITE, &old);
+            *(BYTE*)0x00447C2C = GetIntArg(enm, 0) ? 0x00 : 0x7F;
+            VirtualProtect((LPVOID)0x00447C2C, 1, old, &old);
             break;
         }
         default:
