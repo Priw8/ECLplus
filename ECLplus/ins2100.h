@@ -10,7 +10,8 @@ enum INS2100 {
     INS_PLAYER_SET_POWER,
     INS_PLAYER_SET_IFRAMES,
     INS_PLAYER_TOGGLE_SHOT,
-    INS_PLAYER_TOGGLE_BOMB
+    INS_PLAYER_TOGGLE_BOMB,
+    INS_PLAYER_SET_HYPER_TIMER
 };
 
 #define PlayerPtr 0x004B77D0
@@ -29,6 +30,9 @@ enum INS2100 {
 
 #define PlayerPowerPtr 0x004B5A30
 #define PlayerPower Deref(PlayerPowerPtr)
+
+#define PlayerHyperTimerPtr 0x004B5AAC
+#define PlayerHyperTimer *(FLOAT*)PlayerHyperTimerPtr
 
 /* INS_2100 series: player manipulation */
 BOOL ins_2100(ENEMY* enm, INSTR* ins);

@@ -77,6 +77,9 @@ BOOL ins_2100(ENEMY* enm, INSTR* ins) {
             VirtualProtect((LPVOID)0x00447C2C, 1, old, &old);
             break;
         }
+        case INS_PLAYER_SET_HYPER_TIMER:
+            PlayerHyperTimer = (FLOAT)GetIntArg(enm, 0);
+            break;
         default:
             return FALSE;
     }
