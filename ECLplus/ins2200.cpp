@@ -273,9 +273,9 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
         case INS_ENM_FLAGS: {
             LONG* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) {
-                ENEMY* nenm = &GetEnmById(GetIntArg(enm, 1))->enm;
+                ENEMYFULL* nenm = GetEnmById(GetIntArg(enm, 1));
                 if (nenm != NULL)
-                    *ptr = nenm->flags;
+                    *ptr = nenm->enm.flags;
                 else
                     *ptr = 0;
             }
@@ -284,9 +284,9 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
         case INS_ENM_HP: {
             LONG* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) {
-                ENEMY* nenm = &GetEnmById(GetIntArg(enm, 1))->enm;
+                ENEMYFULL* nenm = GetEnmById(GetIntArg(enm, 1));
                 if (nenm != NULL)
-                    *ptr = nenm->hp;
+                    *ptr = nenm->enm.hp;
                 else
                     *ptr = 0;
             }
