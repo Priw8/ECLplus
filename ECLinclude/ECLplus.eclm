@@ -16,6 +16,7 @@
 2106 playerSetIframes
 2107 playerAllowShot
 2108 playerAllowBomb
+2109 playerSetHyperTimer
 
 2200 msgResetAll
 2201 msgReset
@@ -50,6 +51,8 @@
 -7987 GI7
 -7986 IFRAMES
 -7985 PLSTATE
+-7984 HYPERTIMER
+-7983 DIALOG
 
 !gvar_types
 -8000 $
@@ -68,3 +71,5 @@
 -7987 $
 -7986 $
 -7985 $
+-7984 $
+-7983 $

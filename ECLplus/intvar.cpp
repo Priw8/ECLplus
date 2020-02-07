@@ -38,6 +38,8 @@ DWORD IntVarGetVal(ENEMY* enm, DWORD var) {
             return GetDwordField(Player, PlayerStateField);
         case INTVAR_HYPERTIMER:
             return *INTVAR_HYPERTIMER_LOC;
+        case INTVAR_ISDIALOG:
+            return *INTVAR_ISDIALOG_LOC;
         default:
             return 0;
     }
@@ -80,6 +82,7 @@ DWORD* IntVarGetAddr(ENEMY* enm, DWORD var) {
         case INTVAR_PLAYER_STATE:
             return &GetDwordField(Player, PlayerStateField);
         case INTVAR_HYPERTIMER:
+        case INTVAR_ISDIALOG:
             return &invalidAddr;
         default:
             return &invalidAddr;
