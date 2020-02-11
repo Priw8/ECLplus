@@ -11,12 +11,17 @@ enum INS2200 {
     /* Reserving some instr IDs for possible MSG ins additions */
     INS_GET_CLOSEST_ENM = 10,
     INS_ENM_DAMAGE,
+    INS_ENM_DAMAGE_ITER,
     INS_ENM_DAMAGE_RADIUS,
     INS_ENM_DAMAGE_RECT,
     INS_ENM_ITERATOR,
     INS_ENM_ID_FROM_ITER,
+    INS_ENM_ITER_FROM_ID,
     INS_ENM_FLAGS,
-    INS_ENM_HP
+    INS_ENM_FLAGS_ITER,
+    INS_ENM_HP,
+    INS_ENM_HP_ITER,
+    INS_ENM_POS_ITER
 };
 
 typedef struct {

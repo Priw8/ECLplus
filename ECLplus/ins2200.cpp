@@ -133,6 +133,13 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             }
             break;
         }
+        case INS_ENM_DAMAGE_ITER: {
+            ENEMYLISTNODE* foundEnm = (ENEMYLISTNODE*)GetIntArg(enm, 0);
+            if (foundEnm != NULL) {
+                foundEnm->obj->enm.pendingDmg += GetIntArg(enm, 1);
+            }
+            break;
+        }
         case INS_ENM_DAMAGE_RADIUS: {
             FLOAT x = GetFloatArg(enm, 1), 
                   y = GetFloatArg(enm, 2),
@@ -270,12 +277,35 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             }
             break;
         }
+        case INS_ENM_ITER_FROM_ID: {
+            LONG* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) {
+                LONG id = GetIntArg(enm, 1);
+                ENEMYLISTNODE* node = GameEnmMgr->head;
+                while(node != NULL && node->obj->enm.id != id) {
+                    node = node->next;   
+                }
+                *((ENEMYLISTNODE**)ptr) = node;
+            }
+            break;
+        }
         case INS_ENM_FLAGS: {
             LONG* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) {
                 ENEMYFULL* nenm = GetEnmById(GetIntArg(enm, 1));
                 if (nenm != NULL)
                     *ptr = nenm->enm.flags;
+                else
+                    *ptr = 0;
+            }
+            break;
+        }
+        case INS_ENM_FLAGS_ITER: {
+            LONG* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) {
+                ENEMYLISTNODE* nenm = (ENEMYLISTNODE*)GetIntArg(enm, 1);
+                if (nenm != NULL)
+                    *ptr = nenm->obj->enm.flags;
                 else
                     *ptr = 0;
             }
@@ -289,6 +319,37 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
                     *ptr = nenm->enm.hp;
                 else
                     *ptr = 0;
+            }
+            break;
+        }
+        case INS_ENM_HP_ITER: {
+            LONG* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) {
+                ENEMYLISTNODE* nenm = (ENEMYLISTNODE*)GetIntArg(enm, 1);
+                if (nenm != NULL)
+                    *ptr = nenm->obj->enm.hp;
+                else
+                    *ptr = 0;
+            }
+            break;
+        }
+        case INS_ENM_POS_ITER: {
+            FLOAT* fptrx = GetFloatArgAddr(enm, 0);
+            FLOAT* fptry = GetFloatArgAddr(enm, 1);
+            if (fptrx != NULL || fptry != NULL) {
+                ENEMYLISTNODE* nenm = (ENEMYLISTNODE*)GetIntArg(enm, 2);
+                FLOAT x, y;
+                if (nenm == NULL) {
+                    x = 0.0f;
+                    y = 0.0f;
+                } else {
+                    x = nenm->obj->enm.pos.x;
+                    y = nenm->obj->enm.pos.y;
+                }
+                if (fptrx != NULL)
+                    *fptrx = x;
+                if (fptry != NULL)
+                    *fptry = y;
             }
             break;
         }
