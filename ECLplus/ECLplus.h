@@ -1,3 +1,21 @@
+/*
+* Redistribution and use in source and binary forms, with or without modification,
+* are permitted provided that the following conditions are met:
+*
+* 1. Redistributions of source code must retain this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce this list of conditions and the following disclaimer
+*    in the documentation and/or other materials provided with the distribution.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+* OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+* AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER
+* OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+* OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+* OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 // The following ifdef block is the standard way of creating macros which make exporting
 // from a DLL simpler. All files within this DLL are compiled with the ECLPLUS_EXPORTS
 // symbol defined on the command line. This symbol should not be defined on any project
@@ -11,7 +29,7 @@
 #define ECLPLUS_API __declspec(dllimport)
 #endif
 
-/* Borrowed from thecl */
+/* Adapted from thecl */
 #pragma pack(push, 1)
 #pragma warning(push)
 #pragma warning(disable: 4200)
@@ -21,15 +39,14 @@ typedef struct {
     WORD size;
     WORD paramMask;
     /* The rank bitmask.
-     *   1111LHNE
-     * Bits mean: easy, normal, hard, lunatic. The rest are always set to 1. */
+     *   76OXLHNE
+     * Bits mean: easy, normal, hard, lunatic, extra, overdrive and 2 unused difficulties (6 and 7) */
     BYTE rankMask;
     /* There doesn't seem to be a way of telling how many parameters there are
      * from the additional data. */
     BYTE paramCount;
-    /* From TH13 on, this field stores the number of current stack references
-     * in the parameter list. */
-    DWORD zero;
+    /* How many bytes the ECL stack pointer should be decreased by after executing the instruction. */
+    DWORD popCnt;
     UCHAR data[];
 } INSTR;
 #pragma warning(pop)
@@ -199,7 +216,9 @@ inline VOID EclPrint(CONST CHAR* str) {
 #define GamePrintRenderArg 0x004B7678
 #define GamePrintRenderStructColor 0x00019214
 
-/* Prints given string on the given coordinates within the game window. */
+/* Prints given string on the given coordinates within the game window. 
+ * 'data' contains the raw values that will be pushed to the stack as the
+ * format data for the game's function (must be DWORD aligned length) */
 inline VOID EclPrintRender(FLOAT x, FLOAT y, CONST CHAR* format, DWORD len, CHAR* data) {
     POINTFLOAT p;
     p.x = x;
