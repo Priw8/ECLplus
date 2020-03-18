@@ -20,7 +20,7 @@
 #include "ECLplus.h"
 
 enum INS2000 {
-    INS_MSG_BOX,
+    INS_MSG_BOX = 2000,
     INS_PRINTF,
     INS_CLS,
     INS_DRAW_TEXT,

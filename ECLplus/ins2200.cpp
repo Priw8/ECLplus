@@ -72,7 +72,7 @@ static MESSAGE* MsgReceive(LONG channel, BOOL pop) {
 }
 
 BOOL ins_2200(ENEMY* enm, INSTR* ins) {
-    switch (ins->id - 2200) {
+    switch (ins->id) {
         case INS_MSG_RESET:
             MsgReset();
             break;
@@ -90,7 +90,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
         }
         case INS_MSG_RECEIVE:
         case INS_MSG_PEEK: {
-            MESSAGE* msg = MsgReceive(GetIntArg(enm, 5), (ins->id - 2200) != INS_MSG_PEEK);
+            MESSAGE* msg = MsgReceive(GetIntArg(enm, 5), ins->id != INS_MSG_PEEK);
             
             LONG* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) *ptr = msg == NULL ? 0 : 1;
@@ -106,7 +106,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             fptr = GetFloatArgAddr(enm, 4);
             if (fptr != NULL) *fptr = msg->d;
 
-            if ((ins->id - 2200) != INS_MSG_PEEK)
+            if (ins->id != INS_MSG_PEEK)
                 delete msg;
 
             break;
@@ -370,6 +370,26 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
                     *fptry = y;
             }
             break;
+        }
+        case INS_ENM_BOMBINVULN: {
+            FLOAT* fptr = GetFloatArgAddr(enm, 0);
+            if (fptr != NULL) {
+                ENEMYFULL* nenm = GetEnmById(GetIntArg(enm, 1));
+                if (nenm != NULL)
+                    *fptr = nenm->enm.bombInvuln;
+                else
+                    *fptr = 0.0f;
+            }
+        }
+        case INS_ENM_BOMBINVULN_ITER: {
+            FLOAT* fptr = GetFloatArgAddr(enm, 0);
+            if (fptr != NULL) {
+                ENEMYLISTNODE* nenm = (ENEMYLISTNODE*)GetIntArg(enm, 2);
+                if (nenm != NULL)
+                    *fptr = nenm->obj->enm.bombInvuln;
+                else
+                    *fptr = 0.0f;
+            }
         }
         default:
             return FALSE;

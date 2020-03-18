@@ -20,7 +20,7 @@
 #ins "2000 m*D"
 #ins "2001 m*D"
 #ins "2002"
-#ins "2003 mff*D"
+#ins "2003 ffm*D"
 #ins "2004 S"
 #ins "2005 m"
 
@@ -55,6 +55,8 @@
 #ins "2220 SS"
 #ins "2221 SS"
 #ins "2222 ffS"
+#ins "2223 fS"
+#ins "2224 fS"
 
 inline void msgWait(int channel) {
 	int received = false;

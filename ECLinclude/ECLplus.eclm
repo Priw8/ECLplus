@@ -55,6 +55,8 @@
 2220 enmLife
 2221 enmLifeIter
 2222 enmPosIter
+2223 enmBombInvuln
+2224 enmBombInvulnIter
 
 !gvar_names
 -8000 INPUT

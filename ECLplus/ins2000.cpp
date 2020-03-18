@@ -65,7 +65,7 @@ static VOID EclPrintf(CHAR* buf, DWORD bufSize, INSTR* ins, ENEMY* enm) {
 
 BOOL ins_2000(ENEMY* enm, INSTR* ins) {
     CHAR buf[512];
-    switch (ins->id - 2000) {
+    switch (ins->id) {
     case INS_MSG_BOX:
         EclPrintf(buf, sizeof(buf), ins, enm);
         EclMsg(buf);
@@ -78,14 +78,12 @@ BOOL ins_2000(ENEMY* enm, INSTR* ins) {
         system("cls");
         break;
     case INS_DRAW_TEXT: {
-        DWORD size = *(DWORD*)(&ins->data[0]);
-        CONST CHAR* format = GetStringArg(ins, 0);
+        FLOAT x = GetFloatArg(enm, 0);
 
-        FLOAT x = *(FLOAT*)(&ins->data[size + 4]);
-        x = GetFloatArgEx(enm, 1, x);
+        FLOAT y = GetFloatArg(enm, 1);
 
-        FLOAT y = *(FLOAT*)(&ins->data[size + 8]);
-        y = GetFloatArgEx(enm, 2, y);
+        DWORD size = *(DWORD*)(&ins->data[8]);
+        CONST CHAR* format = GetStringArg(ins, 2);
 
         PARAMD* D = (PARAMD*)&ins->data[size + 12];
         DWORD len = EclArgList(buf, enm, ins, D, 3);

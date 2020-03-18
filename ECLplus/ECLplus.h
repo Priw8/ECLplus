@@ -96,7 +96,8 @@ typedef struct ENEMY {
     LONG hpTreshold;
 
     #define lpad3 (lpad2 + sizeof(pad2) + sizeof(hp) + sizeof(hpMax) + sizeof(hpTreshold))
-    CHAR pad3[0x4080 - lpad3];
+    CHAR pad3[0x407C - lpad3];
+    FLOAT bombInvuln;
     DWORD flags;
 
     #define lpad4 (lpad3 + sizeof(pad3) + sizeof(flags))
@@ -198,7 +199,7 @@ FLOAT* GetFloatArgAddr(ENEMY* enm, DWORD n);
 
 /* Shows a message box of the given content, */
 inline VOID EclMsg(CONST CHAR* str) {
-    MessageBoxA(NULL, str, "ExtraIns", MB_OK);
+    MessageBoxA(NULL, str, "ECLplus", MB_OK);
 }
 
 /* Prints given string in the console. */

@@ -20,7 +20,7 @@
 #include "ECLplus.h"
 
 enum INS2100 {
-    INS_PLAYER_POS,
+    INS_PLAYER_POS = 2100,
     INS_PLAYER_KILL,
     INS_PLAYER_BOMB,
     INS_PLAYER_SET_LIVES,

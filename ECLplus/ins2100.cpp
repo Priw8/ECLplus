@@ -21,7 +21,7 @@
 #include "ECLplus.h"
 
 BOOL ins_2100(ENEMY* enm, INSTR* ins) {
-    switch(ins->id - 2100) {
+    switch(ins->id) {
         case INS_PLAYER_POS:
             SetDwordField(Player, PlayerXField, (LONG)(GetFloatArg(enm, 0) * 128.0f));
             SetDwordField(Player, PlayerYField, (LONG)(GetFloatArg(enm, 1) * 128.0f));

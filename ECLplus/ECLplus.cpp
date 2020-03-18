@@ -34,7 +34,7 @@ static VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
     } else if (ins->id >= 2200 && ins->id < 2300) {
         success = ins_2200(enm, ins);
     } else {
-        success = true;
+        success = TRUE;
         snprintf(buf, 256, "instruction out of range: %d", ins->id);
         EclMsg(buf);
     }
