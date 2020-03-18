@@ -71,6 +71,16 @@ static MESSAGE* MsgReceive(LONG channel, BOOL pop) {
     return NULL;
 }
 
+static LONG ApplyBombShields(LONG dmg, ENEMY* attacker, ENEMY* target, INSTR* ins, DWORD paramN) {
+    if (ins->paramCount <= paramN || !GetIntArg(attacker, paramN))
+        return dmg;
+
+    if (target->flags & FLAG_BOMBSHIELD)
+        return 0;
+
+    return (LONG)((FLOAT)dmg * target->bombInvuln);
+}
+
 BOOL ins_2200(ENEMY* enm, INSTR* ins) {
     switch (ins->id) {
         case INS_MSG_RESET:
@@ -144,17 +154,19 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             }
             break;
         }
+        /* Eneme damaging instr can take an extra parameter (0 by default),
+         * determines whether this is "bomb damage" and bombshield/invluln should take effect. */
         case INS_ENM_DAMAGE: {
             ENEMYFULL* foundEnm = GetEnmById(GetIntArg(enm, 0));
             if (foundEnm != NULL) {
-                foundEnm->enm.pendingDmg += GetIntArg(enm, 1);
+                foundEnm->enm.pendingDmg += ApplyBombShields(GetIntArg(enm, 1), enm, &foundEnm->enm, ins, 2);
             }
             break;
         }
         case INS_ENM_DAMAGE_ITER: {
             ENEMYLISTNODE* foundEnm = (ENEMYLISTNODE*)GetIntArg(enm, 0);
             if (foundEnm != NULL) {
-                foundEnm->obj->enm.pendingDmg += GetIntArg(enm, 1);
+                foundEnm->obj->enm.pendingDmg += ApplyBombShields(GetIntArg(enm, 1), enm, &foundEnm->obj->enm, ins, 2);
             }
             break;
         }
@@ -212,7 +224,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             for (DWORD itr = 0; itr < i; ++itr) {
                 if (maxcnt > 0 && cnt >= maxcnt)
                     break;
-                enmArr[itr]->pendingDmg += dmg;
+                enmArr[itr]->pendingDmg += ApplyBombShields(dmg, enm, enmArr[itr], ins, 6);
                 ++cnt;
             }
 
@@ -263,7 +275,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             for (DWORD itr = 0; itr < i; ++itr) {
                 if (maxcnt > 0 && cnt >= maxcnt)
                     break;
-                enmArr[itr]->pendingDmg += dmg;
+                enmArr[itr]->pendingDmg += ApplyBombShields(dmg, enm, enmArr[itr], ins, 7);
                 ++cnt;
             }
 
