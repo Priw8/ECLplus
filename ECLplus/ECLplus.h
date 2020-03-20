@@ -100,7 +100,7 @@ typedef struct ENEMY {
     FLOAT bombInvuln;
     DWORD flags;
 
-    #define lpad4 (lpad3 + sizeof(pad3) + sizeof(flags))
+    #define lpad4 (lpad3 + sizeof(pad3) + sizeof(flags) + sizeof(bombInvuln))
     CHAR pad4[0x4554 - lpad4];
     DWORD id;
 } ENEMY;
