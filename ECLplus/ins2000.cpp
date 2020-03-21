@@ -70,6 +70,7 @@ BOOL ins_2000(ENEMY* enm, INSTR* ins) {
         EclPrintf(buf, sizeof(buf), ins, enm);
         EclMsg(buf);
         break;
+#ifdef DEV
     case INS_PRINTF:
         EclPrintf(buf, sizeof(buf), ins, enm);
         EclPrint(buf);
@@ -77,6 +78,7 @@ BOOL ins_2000(ENEMY* enm, INSTR* ins) {
     case INS_CLS:
         system("cls");
         break;
+#endif
     case INS_DRAW_TEXT: {
         FLOAT x = GetFloatArg(enm, 0);
 

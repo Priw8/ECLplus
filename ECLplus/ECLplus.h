@@ -203,6 +203,7 @@ inline VOID EclMsg(CONST CHAR* str) {
 }
 
 /* Prints given string in the console. */
+#ifdef DEV
 inline VOID EclPrint(CONST CHAR* str) {
     HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
     if (handle == INVALID_HANDLE_VALUE || handle == NULL) {
@@ -212,6 +213,9 @@ inline VOID EclPrint(CONST CHAR* str) {
     DWORD wr;
     WriteConsoleA(handle, str, strlen(str), &wr, NULL);
 }
+#else
+#define EclPrint(x)
+#endif
 
 #define GamePrintRender 0x004082B0
 #define GamePrintRenderArg 0x004B7678

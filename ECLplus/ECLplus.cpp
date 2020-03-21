@@ -25,7 +25,9 @@
 
 /* Executes an extra ECL instruction, called by the modified game. */
 static VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
+#ifdef DEV
     CHAR buf[256];
+#endif
     BOOL success;
     if (ins->id >= 2000 && ins->id < 2100) {
         success = ins_2000(enm, ins);
@@ -33,7 +35,9 @@ static VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
         success = ins_2100(enm, ins);
     } else if (ins->id >= 2200 && ins->id < 2300) {
         success = ins_2200(enm, ins);
-    } else {
+    }
+#ifdef DEV
+    else {
         success = TRUE;
         snprintf(buf, 256, "instruction out of range: %d", ins->id);
         EclMsg(buf);
@@ -42,6 +46,7 @@ static VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
         snprintf(buf, 256, "bad instruction number: %d", ins->id);
         EclMsg(buf);
     }
+#endif
 }
 
 static DWORD __stdcall IntVarSwitch(ENEMY* enm, DWORD var, DWORD type) {
@@ -199,7 +204,9 @@ CONST BINHACK binhacks[] = {
 #define BHACKLEN (sizeof(binhacks) / sizeof(BINHACK))
 
 VOID init() {
+#ifdef DEV
     InitConsole();
+#endif
     DWORD old;
     /* Some code of the game has to be overwritten to call DLL functions. */
     /* ECL instructions: */
