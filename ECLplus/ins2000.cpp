@@ -109,6 +109,9 @@ BOOL ins_2000(ENEMY* enm, INSTR* ins) {
             call eax
         }
         break;
+    case INS_EXIT:
+        GamemodeNext = 4; /* GAMEMODE_MENU */
+        break;
     default:
         return FALSE;
     }

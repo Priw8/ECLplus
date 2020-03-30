@@ -19,6 +19,7 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 - `drawf(float x, float y, string format, ...)` - draws a printf-formatted string on the given coordinates in the game window (ECL coordinate system). Top-left corner of the string corresponds to the coordinates given. It will only be drawn for 1 frame, in order to keep it displayed all the time `drawf` needs to be in a loop.
 - `drawColor(int c)` - sets color of strings drawn by `drawf`. Example: `drawColor(0xFF00FF00)` sets color to green. The order is reversed (ABGR), so this has alpha value of `FF`, blue value of `00`, green value of `FF` and red value of `00`.
 - `playMusic(string name)` - replaces currently playing music with a new one. The name must be the same as in `thbgm.fmt` (e.g. `th17_06.wav`).
+- `exit()` - unconditionally exits to the main menu (does not allow saving replays)
 
 **ins_2100 series: player manipulation**  
 - `playerPos(float x, float y)` - move the player to the given coordinates.

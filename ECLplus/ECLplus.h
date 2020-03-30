@@ -166,6 +166,9 @@ typedef double DOUBLE;
 
 #define WriteIfNotNull(x, y) (if (x != NULL) *x = y)
 
+#define Gamemode *(DWORD*)(0x004B61D0)
+#define GamemodeNext *(DWORD*)(0x004B61D4)
+
 // #define GetVm(x) (DWORD*)(*((DWORD*)(*(x+0x000044D8))+0x0C))
 
 
