@@ -24,6 +24,7 @@
 2004 drawColor
 2005 playMusic
 2006 exit
+2007 itemSpeed
 
 2100 playerPos
 2101 playerKill

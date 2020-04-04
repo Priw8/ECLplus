@@ -112,6 +112,9 @@ BOOL ins_2000(ENEMY* enm, INSTR* ins) {
     case INS_EXIT:
         GamemodeNext = 4; /* GAMEMODE_MENU */
         break;
+    case INS_ITEM_SLOWDOWN:
+        GameItemMgr->slowdown = GetFloatArg(enm, 0);
+        break;
     default:
         return FALSE;
     }

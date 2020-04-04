@@ -20,6 +20,7 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 - `drawColor(int c)` - sets color of strings drawn by `drawf`. Example: `drawColor(0xFF00FF00)` sets color to green. The order is reversed (ABGR), so this has alpha value of `FF`, blue value of `00`, green value of `FF` and red value of `00`.
 - `playMusic(string name)` - replaces currently playing music with a new one. The name must be the same as in `thbgm.fmt` (e.g. `th17_06.wav`).
 - `exit()` - unconditionally exits to the main menu (does not allow saving replays)
+- `itemSpeed(float factor)` - set item falling speed factor, when the factor is smaller than `1.0f` the items automatically get the animation they have in LoLK. The game automatically increases the factor by `0.1f` every frame until it's back to `1.0f`.
 
 **ins_2100 series: player manipulation**  
 - `playerPos(float x, float y)` - move the player to the given coordinates.

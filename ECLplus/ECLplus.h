@@ -129,6 +129,13 @@ typedef struct ENEMYMGR {
 } ENEMYMGR;
 #pragma pack(pop)
 
+#pragma pack(push, 1)
+typedef struct ITEMMGR {
+    CHAR pad1[0xe4b974];
+    FLOAT slowdown;
+} ITEMMGR;
+#pragma pack(pop)
+
 typedef double DOUBLE;
 
 #define SetDwordField(ptr,off,val) (*((DWORD*)(ptr + off)) = val)
@@ -138,6 +145,7 @@ typedef double DOUBLE;
 #define Deref(x) (*(DWORD*)x)
 
 #define GameEnmMgr ((ENEMYMGR*)Deref(0x004B76A0))
+#define GameItemMgr ((ITEMMGR*)Deref(0x004B76B8))
 
 #define EXPORT_LOC ((LPVOID)0x00499FE8)
 #define CODECAVE_LOC ((LPVOID)0x00499EBA)

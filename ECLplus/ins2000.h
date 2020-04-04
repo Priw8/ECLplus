@@ -26,7 +26,8 @@ enum INS2000 {
     INS_DRAW_TEXT,
     INS_TEXT_COLOR,
     INS_BGM_SWITCH,
-    INS_EXIT
+    INS_EXIT,
+    INS_ITEM_SLOWDOWN
 };
 
 /* INS_2000 series: general debug utilities */
