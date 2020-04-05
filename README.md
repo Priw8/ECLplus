@@ -81,3 +81,4 @@ In all following instructions, every time there is a variable parameter that get
 - `PLSTATE` - int, player state. The following constants from `ECLplus.tecl` contain possible values: `PL_NORMAL`, `PL_DYING`, `PL_DEAD` and `PL_RESPAWN`. Writable (but just because you can doesn't mean that you should).
 - `HYPERTIMER` - int, timer of a hyper. Not writable, use `playerSetHyperTimer` instruction instead.
 - `DIALOG` - int, 0 if no dialog is active, nonzero if there is dialog active. Not writable.
+- `SPELLBONUS` - int, current spell bonus. Returns `0` if there is no spell active.
