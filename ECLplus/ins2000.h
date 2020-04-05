@@ -27,7 +27,10 @@ enum INS2000 {
     INS_TEXT_COLOR,
     INS_BGM_SWITCH,
     INS_EXIT,
-    INS_ITEM_SLOWDOWN
+    INS_ITEM_SLOWDOWN,
+    INS_SPELL_CAPTURE,
+    INS_SPELL_BONUS,
+    INS_SPELL_BONUS_NOW
 };
 
 /* INS_2000 series: general debug utilities */

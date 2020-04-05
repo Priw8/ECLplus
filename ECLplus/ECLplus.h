@@ -136,6 +136,16 @@ typedef struct ITEMMGR {
 } ITEMMGR;
 #pragma pack(pop)
 
+#pragma pack(push, 1)
+typedef struct SPELLCARD {
+    CHAR pad1[0x78];
+    DWORD flags;
+    DWORD bonus;
+    DWORD bonusMax;
+} SPELLCARD;
+#pragma pack(pop, 1)
+#define SPELL_FLAG_CAPTURE 0x02
+
 typedef double DOUBLE;
 
 #define SetDwordField(ptr,off,val) (*((DWORD*)(ptr + off)) = val)
@@ -146,6 +156,7 @@ typedef double DOUBLE;
 
 #define GameEnmMgr ((ENEMYMGR*)Deref(0x004B76A0))
 #define GameItemMgr ((ITEMMGR*)Deref(0x004B76B8))
+#define GameSpell ((SPELLCARD*)Deref(0x004B7690))
 
 #define EXPORT_LOC ((LPVOID)0x00499FE8)
 #define CODECAVE_LOC ((LPVOID)0x00499EBA)

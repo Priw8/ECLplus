@@ -115,6 +115,26 @@ BOOL ins_2000(ENEMY* enm, INSTR* ins) {
     case INS_ITEM_SLOWDOWN:
         GameItemMgr->slowdown = GetFloatArg(enm, 0);
         break;
+    case INS_SPELL_CAPTURE:
+        if (GameSpell) {
+            if (GetIntArg(enm, 0)) {
+                GameSpell->flags |= SPELL_FLAG_CAPTURE;
+            } else {
+                GameSpell->flags &= ~SPELL_FLAG_CAPTURE;
+            }
+        }
+        break;
+    case INS_SPELL_BONUS:
+        if (GameSpell) {
+            GameSpell->bonus = GetIntArg(enm, 0);
+            GameSpell->bonusMax = GameSpell->bonus;
+        }
+        break;
+    case INS_SPELL_BONUS_NOW:
+        if (GameSpell) {
+            GameSpell->bonus = GetIntArg(enm, 0);
+        }
+        break;
     default:
         return FALSE;
     }

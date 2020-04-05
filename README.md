@@ -21,6 +21,9 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 - `playMusic(string name)` - replaces currently playing music with a new one. The name must be the same as in `thbgm.fmt` (e.g. `th17_06.wav`).
 - `exit()` - unconditionally exits to the main menu (does not allow saving replays)
 - `itemSpeed(float factor)` - set item falling speed factor, when the factor is smaller than `1.0f` the items automatically get the animation they have in LoLK. The game automatically increases the factor by `0.1f` every frame until it's back to `1.0f`.
+- `spellSetCapture(int cap)` - change current spell's capture state, `0` will set bonus to "failed", any other value will allow capturing the spell. Does NOT set the ECL `CAPTURE` variable to 0.
+- `spellSetBonus(int bonus)` - set both max spell bonus and current bonus of the current spell to the given value.
+- `spellSetBonusNow(int bonus)` - set only the current bonus of the current spell. This means that the speed at which the bonus decreases will still be determined by the old max spell bonus value.
 
 **ins_2100 series: player manipulation**  
 - `playerPos(float x, float y)` - move the player to the given coordinates.

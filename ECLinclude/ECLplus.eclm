@@ -25,6 +25,9 @@
 2005 playMusic
 2006 exit
 2007 itemSpeed
+2008 spellSetCapture
+2009 spellSetBonus
+2010 spellSetBonusNow
 
 2100 playerPos
 2101 playerKill
