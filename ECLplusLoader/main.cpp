@@ -31,14 +31,17 @@ HANDLE GetRunningHandle() {
     entry.dwSize = sizeof(entry);
 
     if (!Process32First(snapshot, &entry)) {
+        CloseHandle(snapshot);
         return NULL;
     }
     do {
         if (CompareStringOrdinal(entry.szExeFile, -1, GAMENAME, -1, TRUE) == CSTR_EQUAL) {
+            CloseHandle(snapshot);
             return OpenProcess(PROCESS_ALL_ACCESS, FALSE, entry.th32ProcessID);
         }
     } while (Process32Next(snapshot, &entry));
 
+    CloseHandle(snapshot);
     return NULL;
 }
 
