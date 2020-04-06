@@ -49,7 +49,7 @@ DWORD IntVarGetVal(ENEMY* enm, DWORD var) {
         case INTVAR_GI5:
         case INTVAR_GI6:
         case INTVAR_GI7:
-            return GI[var + 8000 - INTVAR_GI4];
+            return GI[var - INTVAR_GI4];
         case INTVAR_IFRAMES:
             return GetDwordField(Player, PlayerIframeIntField);
         case INTVAR_PLAYER_STATE:
@@ -96,7 +96,7 @@ DWORD* IntVarGetAddr(ENEMY* enm, DWORD var) {
         case INTVAR_GI5:
         case INTVAR_GI6:
         case INTVAR_GI7:
-            return &GI[var + 8000 - INTVAR_GI4];
+            return &GI[var - INTVAR_GI4];
         case INTVAR_IFRAMES:
             return &invalidAddr;
         case INTVAR_PLAYER_STATE:
