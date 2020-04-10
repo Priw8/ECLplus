@@ -103,10 +103,14 @@ BOOL ins_2000(ENEMY* enm, INSTR* ins) {
         SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructAnchorX, GetIntArg(enm, 0));
         SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructAnchorY, GetIntArg(enm, 1));
         break;
+    case INS_TEXT_SHADOW:
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructShadow, GetIntArg(enm, 0));
+        break;
     case INS_TEXT_RESET:
         SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructFont, 0);
         SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructAnchorX, 1);
         SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructAnchorY, 1);
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructShadow, 0);
         SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructColor, 0xFFFFFFFF);
         break;
     case INS_BGM_SWITCH:

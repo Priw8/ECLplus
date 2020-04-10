@@ -33,7 +33,8 @@ enum INS2000 {
     INS_SPELL_BONUS_NOW,
     INS_TEXT_FONT,
     INS_TEXT_ANCHOR,
-    INS_TEXT_RESET
+    INS_TEXT_RESET,
+    INS_TEXT_SHADOW
 };
 
 /* INS_2000 series: general debug utilities */

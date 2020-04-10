@@ -31,6 +31,7 @@
 2011 drawFont
 2012 drawAnchor
 2013 drawReset
+2014 drawShadow
 
 2100 playerPos
 2101 playerKill

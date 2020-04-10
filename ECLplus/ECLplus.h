@@ -249,6 +249,7 @@ inline VOID EclPrint(CONST CHAR* str) {
 #define GamePrintRenderStructFont 0x0001922c
 #define GamePrintRenderStructAnchorX 0x00019238
 #define GamePrintRenderStructAnchorY 0x0001923c
+#define GamePrintRenderStructShadow 0x00019228
 
 /* Prints given string on the given coordinates within the game window. 
  * 'data' contains the raw values that will be pushed to the stack as the
