@@ -100,3 +100,9 @@ global PL_DYING = 4;
 global PL_DEAD = 2;
 global PL_NORMAL = 1;
 global PL_RESPAWN = 0;
+
+global ANCHOR_CENTER = 0;
+global ANCHOR_LEFT = 1;
+global ANCHOR_RIGHT = 2;
+global ANCHOR_TOP = 1;
+global ANCHOR_BOTTOM = 2;

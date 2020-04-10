@@ -19,7 +19,7 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 - `drawf(float x, float y, string format, ...)` - draws a printf-formatted string on the given coordinates in the game window (ECL coordinate system). Top-left corner of the string corresponds to the coordinates given. It will only be drawn for 1 frame, in order to keep it displayed all the time `drawf` needs to be in a loop.
 - `drawColor(int c)` - sets color of strings drawn by `drawf`. Example: `drawColor(0xFFFF8800)` sets color to orange. Alpha is stored in the MSB, so that the order is ARGB; the example has an alpha value of `FF`, red value of `FF`, green value of `88` and blue value of `00`.
 - `drawFont(int f)` - sets font of strings drawn by `drawf`.  The argument is the ID of an `ascii.anm` font.  Be aware that not all fonts support all printable ASCII characters, and the game may crash if the chosen font cannot render the given text.
-- `drawAnchor(int h, int v)` - sets anchor point of strings drawn by `drawf`.  `h = 0/1/2` is center/left/right.  `v = 0/1/2` is center/top/bottom.  Default is `(1, 1)` (left/top).
+- `drawAnchor(int h, int v)` - sets anchor point of strings drawn by `drawf`.  `h = 0/1/2` is center/left/right.  `v = 0/1/2` is center/top/bottom.  Default is `(1, 1)` (left/top). Globals `ANCHOR_CENTER`, `ANCHOR_LEFT`, `ANCHOR_RIGHT`, `ANCHOR_TOP` and `ANCHOR_BOTTOM` are provided for convenience.
 - `drawShadow(int bool)` - enable or disable drop shadows for `drawf`.
 - `drawReset()` - resets all modified attributes of `drawf` to their defaults.
 - `playMusic(string name)` - replaces currently playing music with a new one. The name must be the same as in `thbgm.fmt` (e.g. `th17_06.wav`).
