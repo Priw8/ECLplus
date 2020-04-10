@@ -17,7 +17,11 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 - `printf(string format, ...)` - prints a printf-formatted string in the console, same concept as the instruction above.
 - `cls()` - clears the console.
 - `drawf(float x, float y, string format, ...)` - draws a printf-formatted string on the given coordinates in the game window (ECL coordinate system). Top-left corner of the string corresponds to the coordinates given. It will only be drawn for 1 frame, in order to keep it displayed all the time `drawf` needs to be in a loop.
-- `drawColor(int c)` - sets color of strings drawn by `drawf`. Example: `drawColor(0xFF00FF00)` sets color to green. The order is reversed (ABGR), so this has alpha value of `FF`, blue value of `00`, green value of `FF` and red value of `00`.
+- `drawColor(int c)` - sets color of strings drawn by `drawf`. Example: `drawColor(0xFFFF8800)` sets color to orange. Alpha is stored in the MSB, so that the order is ARGB; the example has an alpha value of `FF`, red value of `FF`, green value of `88` and blue value of `00`.
+- `drawFont(int f)` - sets font of strings drawn by `drawf`.  The argument is the ID of an `ascii.anm` font.  Be aware that not all fonts support all printable ASCII characters, and the game may crash if the chosen font cannot render the given text.
+- `drawAnchor(int h, int v)` - sets anchor point of strings drawn by `drawf`.  `h = 0/1/2` is center/left/right.  `v = 0/1/2` is center/top/bottom.  Default is `(1, 1)` (left/top).
+- `drawShadow(int bool)` - enable or disable drop shadows for `drawf`.
+- `drawReset()` - resets all modified attributes of `drawf` to their defaults.
 - `playMusic(string name)` - replaces currently playing music with a new one. The name must be the same as in `thbgm.fmt` (e.g. `th17_06.wav`).
 - `exit()` - unconditionally exits to the main menu (does not allow saving replays)
 - `itemSpeed(float factor)` - set item falling speed factor, when the factor is smaller than `1.0f` the items automatically get the animation they have in LoLK. The game automatically increases the factor by `0.1f` every frame until it's back to `1.0f`.

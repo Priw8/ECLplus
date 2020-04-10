@@ -96,6 +96,23 @@ BOOL ins_2000(ENEMY* enm, INSTR* ins) {
     case INS_TEXT_COLOR:
         SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructColor, GetIntArg(enm, 0));
         break;
+    case INS_TEXT_FONT:
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructFont, GetIntArg(enm, 0));
+        break;
+    case INS_TEXT_ANCHOR:
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructAnchorX, GetIntArg(enm, 0));
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructAnchorY, GetIntArg(enm, 1));
+        break;
+    case INS_TEXT_SHADOW:
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructShadow, GetIntArg(enm, 0));
+        break;
+    case INS_TEXT_RESET:
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructFont, 0);
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructAnchorX, 1);
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructAnchorY, 1);
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructShadow, 0);
+        SetDwordField(Deref(GamePrintRenderArg), GamePrintRenderStructColor, 0xFFFFFFFF);
+        break;
     case INS_BGM_SWITCH:
         /* Max 16 bytes because that's the max size of a name in thbgm.fmt file. */
         strcpy_s((char*)0x00528e88, 16, GetStringArg(ins, 0));
