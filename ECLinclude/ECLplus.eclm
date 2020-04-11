@@ -43,6 +43,8 @@
 2107 playerAllowShot
 2108 playerAllowBomb
 2109 playerSetHyperTimer
+2110 playerSetDamageMult
+2111 playerSetSpeedMult
 
 2200 msgResetAll
 2201 msgReset
