@@ -304,6 +304,7 @@
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="binhack.h" />
     <ClInclude Include="ins2000.h" />
     <ClInclude Include="ins2100.h" />
     <ClInclude Include="ins2200.h" />
@@ -312,6 +313,7 @@
     <ClInclude Include="ECLplus.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="binhack.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ins2100.cpp" />
     <ClCompile Include="ins2200.cpp" />

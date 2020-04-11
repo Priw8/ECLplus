@@ -70,12 +70,6 @@ typedef struct {
 } PARAMD;
 #pragma pack(pop)
 
-typedef struct {
-    LPVOID addr;
-    CONST UCHAR* code;
-    DWORD codelen;
-} BINHACK;
-
 #pragma pack(push, 1)
 typedef struct ENEMY {
     CHAR pad0[0x44];
@@ -157,23 +151,6 @@ typedef double DOUBLE;
 #define GameEnmMgr ((ENEMYMGR*)Deref(0x004B76A0))
 #define GameItemMgr ((ITEMMGR*)Deref(0x004B76B8))
 #define GameSpell ((SPELLCARD*)Deref(0x004B7690))
-
-#define EXPORT_LOC ((LPVOID)0x00499FE8)
-#define CODECAVE_LOC ((LPVOID)0x00499EBA)
-#define INS_HANDLER_LOC ((LPVOID)0x004211AB)
-
-#define EXPORT_INTVAR_LOC ((LPVOID)0x00499FE4)
-#define INTVARGET_HANDLER_LOC ((LPVOID)0x00427524)
-#define CODECAVE_INTVARGET_LOC ((LPVOID)0x00499ECA)
-#define INTVARADDR_HANDLER_LOC ((LPVOID)0x00427Cf1)
-#define CODECAVE_INTVARADDR_LOC ((LPVOID)0x00499EDB)
-
-#define CODECAVE_ENMDMG_LOC ((LPVOID)0x00499EEE)
-#define CODECAVE_ENMDMG_JUMP_LOC ((LPVOID)0x0041FA15)
-
-#define CODECAVE_MAINLOOP_LOC ((LPVOID)0x00499F0A)
-#define CODECAVE_MAINLOOP_JUMP_LOC ((LPVOID)0x004612DE)
-#define MAINLOOP_HANDLER_LOC ((LPVOID)0x00499FE0)
 
 #define GameGetIntArg 0x00428CC0
 #define GameGetFloatArg 0x00428CF0
