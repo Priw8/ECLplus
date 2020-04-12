@@ -2,6 +2,8 @@
 #include "ECLplus.h"
 #include "binhack.h"
 
+static CONST UCHAR binhackNop10[] = { 0x66, 0x66, 0x0f, 0x1f, 0x84, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
 static CONST UCHAR binhackInsCall[] = { 0x52, 0x57, 0xA1, 0xE8, 0x9F, 0x49, 0x00, 0xFF, 0xD0, 0xB8, 0xF2, 0x65, 0x42, 0x00, 0xFF, 0xE0 };
 static CONST UCHAR binhackInsCallJump[] = { 0x0F, 0x87, 0x09, 0x8D, 0x07, 0x00 };
 
@@ -57,6 +59,16 @@ CONST BINHACK binhacks[] = {
         ENMDMG_JUMP,
         binhackEnmDamageJump,
         sizeof(binhackEnmDamageJump)
+    },
+    {
+        PLAYER_DAMAGE_NOP,
+        binhackNop10,
+        sizeof(binhackNop10)
+    },
+    {
+        PLAYER_SPEED_NOP,
+        binhackNop10,
+        sizeof(binhackNop10)
     },
     {
         MAINLOOP_CODECAVE,

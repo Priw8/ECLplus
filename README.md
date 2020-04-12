@@ -40,6 +40,8 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 - `playerAllowShot(int state)` - disable/enable player's ability to shoot.
 - `playerAllowBomb(int state)` - disable/enable player's ability to bomb.
 - `playerSetHyperTimer(int time)` - manipulate the timer of an ongoing hyper.
+- `playerSetDamageMult(float mult)` - set the player's damage multiplier.  When the factor is greater than `1f`, some visual effects from HSiFS's winter release will be enabled.
+- `playerSetSpeedMult(float mult)` - set the player's movement speed multiplier.  When the factor is greater than `1f`, some visual effects from HSiFS's autumn release will be enabled.
 
 **ins_2200 series: extended enemy intertaction**
 A more in-depth explanation of the message system can be found [here](EnmMsg.md).

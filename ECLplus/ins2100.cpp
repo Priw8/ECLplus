@@ -98,6 +98,12 @@ BOOL ins_2100(ENEMY* enm, INSTR* ins) {
         case INS_PLAYER_SET_HYPER_TIMER:
             PlayerHyperTimer = (FLOAT)GetIntArg(enm, 0);
             break;
+        case INS_PLAYER_SET_DAMAGE_MULT:
+            SetFloatField(Player, PlayerDamageMultField, GetFloatArg(enm, 0));
+            break;
+        case INS_PLAYER_SET_SPEED_MULT:
+            SetFloatField(Player, PlayerSpeedMultField, GetFloatArg(enm, 0));
+            break;
         default:
             return FALSE;
     }

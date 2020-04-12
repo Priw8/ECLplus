@@ -29,7 +29,9 @@ enum INS2100 {
     INS_PLAYER_SET_IFRAMES,
     INS_PLAYER_TOGGLE_SHOT,
     INS_PLAYER_TOGGLE_BOMB,
-    INS_PLAYER_SET_HYPER_TIMER
+    INS_PLAYER_SET_HYPER_TIMER,
+    INS_PLAYER_SET_DAMAGE_MULT,
+    INS_PLAYER_SET_SPEED_MULT
 };
 
 #define PlayerPtr 0x004B77D0
@@ -39,6 +41,8 @@ enum INS2100 {
 #define PlayerStateField 0x18DB0
 #define PlayerIframeIntField 0x18E7C
 #define PlayerIframeFloatField 0x18E80
+#define PlayerDamageMultField 0x1907C
+#define PlayerSpeedMultField 0x18EC8
 
 #define PlayerLivesPtr 0x004B5A40
 #define PlayerLives Deref(PlayerLivesPtr)
