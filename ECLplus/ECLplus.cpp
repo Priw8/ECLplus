@@ -57,7 +57,7 @@ static DWORD __stdcall IntVarSwitch(ENEMY* enm, DWORD var, DWORD type) {
         return (DWORD)IntVarGetAddr(enm, var);
 }
 
-LONG GetIntArg(ENEMY* enm, DWORD n) {
+LONG DECLSPEC_NOINLINE GetIntArg(ENEMY* enm, DWORD n) {
     /* Calling the __thiscall requires assembly */
     LONG res;
     __asm {
@@ -70,7 +70,7 @@ LONG GetIntArg(ENEMY* enm, DWORD n) {
     return res;
 }
 
-LONG GetIntArgEx(ENEMY* enm, DWORD n, DWORD val) {
+LONG DECLSPEC_NOINLINE GetIntArgEx(ENEMY* enm, DWORD n, DWORD val) {
     LONG res;
     _asm {
         mov ecx, enm
@@ -83,7 +83,7 @@ LONG GetIntArgEx(ENEMY* enm, DWORD n, DWORD val) {
     return res;
 }
 
-FLOAT GetFloatArg(ENEMY* enm, DWORD n) {
+DECLSPEC_NOINLINE FLOAT GetFloatArg(ENEMY* enm, DWORD n) {
     FLOAT res;
     __asm {
         mov ecx, enm
@@ -95,7 +95,7 @@ FLOAT GetFloatArg(ENEMY* enm, DWORD n) {
     return res;
 }
 
-FLOAT GetFloatArgEx(ENEMY* enm, DWORD n, FLOAT val) {
+DECLSPEC_NOINLINE FLOAT GetFloatArgEx(ENEMY* enm, DWORD n, FLOAT val) {
     FLOAT res;
     __asm {
         mov ecx, enm
@@ -112,7 +112,7 @@ const CHAR* GetStringArg(INSTR* ins, DWORD n) {
     return (const CHAR*) &(ins->data[n * 4 + 4]);
 }
 
-LONG* GetIntArgAddr(ENEMY* enm, DWORD n) {
+DECLSPEC_NOINLINE LONG* GetIntArgAddr(ENEMY* enm, DWORD n) {
     LONG* res;
     __asm {
         mov ecx, enm
@@ -124,7 +124,7 @@ LONG* GetIntArgAddr(ENEMY* enm, DWORD n) {
     return res;
 }
 
-FLOAT* GetFloatArgAddr(ENEMY* enm, DWORD n) {
+DECLSPEC_NOINLINE FLOAT* GetFloatArgAddr(ENEMY* enm, DWORD n) {
     FLOAT* res;
     __asm {
         mov ecx, enm
