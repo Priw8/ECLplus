@@ -13,7 +13,7 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 
 ## Instruction list
 **ins_2000 series: various things that don't fall into a specific category**
-- `msgf(string format, ...)` - shows a printf-formatted message box. Example: `msgf("Hello from ECL! My id is %d", _SS ID)` (note that since this uses the `D` param type for extra parameters, prefixing with typecast is necessary as of current thecl version).  
+- `msgf(string format, ...)` - shows a printf-formatted message box. Example: `msgf("Hello from ECL! My id is %d", _SS ID)` (note that since this uses the `D` param type for extra parameters, prefixing with typecast is necessary as of current thecl version).
 - `printf(string format, ...)` - prints a printf-formatted string in the console, same concept as the instruction above.
 - `cls()` - clears the console.
 - `drawf(float x, float y, string format, ...)` - draws a printf-formatted string on the given coordinates in the game window (ECL coordinate system). Top-left corner of the string corresponds to the coordinates given. It will only be drawn for 1 frame, in order to keep it displayed all the time `drawf` needs to be in a loop.
@@ -29,7 +29,7 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 - `spellSetBonus(int bonus)` - set both max spell bonus and current bonus of the current spell to the given value.
 - `spellSetBonusNow(int bonus)` - set only the current bonus of the current spell. This means that the speed at which the bonus decreases will still be determined by the old max spell bonus value.
 
-**ins_2100 series: player manipulation**  
+**ins_2100 series: player manipulation**
 - `playerPos(float x, float y)` - move the player to the given coordinates.
 - `playerKill()` - immidiately kill the player.
 - `playerBomb()` - immidiately make the player bomb (even if there are 0 bombs, though using this instruction does take away a bomb from the player).
@@ -41,7 +41,7 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 - `playerAllowBomb(int state)` - disable/enable player's ability to bomb.
 - `playerSetHyperTimer(int time)` - manipulate the timer of an ongoing hyper.
 - `playerSetDamageMult(float mult)` - set the player's damage multiplier.  When the factor is greater than `1f`, some visual effects from HSiFS's winter release will be enabled.
-- `playerSetSpeedMult(float mult)` - set the player's movement speed multiplier.  When the factor is greater than `1f`, some visual effects from HSiFS's autumn release will be enabled.
+- `playerSetSpeedMult(float mult)` - set the player's movement speed multiplier.  When the factor is greater than `1f`, some visual effects from HSiFS's autumn release will be enabled. (but this variable is not entirely just a TH16 leftover; Marisa's bombs use it).  You must call this function every frame, as otherwise the game will reset it to `1f`.
 
 **ins_2200 series: extended enemy intertaction**
 A more in-depth explanation of the message system can be found [here](EnmMsg.md).
@@ -51,9 +51,9 @@ A more in-depth explanation of the message system can be found [here](EnmMsg.md)
 - `msgReceive(intvar received, floatvar a, floatvar b, floatvar c, floatvar d, int channel)` - receive message from the given channel. The `a`-`d` variables will be set to the values from the message (if there are any messages to receive), `received` variable will be set to 1 if a message was received and to 0 otherwise.
 - `msgPeek(intvar received, floatvar a, floatvar b, floatvar c, floatvar d, int channel)` - similar to `msgReceive`, except it doesn't actually receive the message (it stays on the list of messages in the channel). Can be used to check the message before actually deciding to receive it.
 - `msgCheck(intvar receive, int channel)` - sets `receive` to 1 if there are any messages to be received in the given channel, 0 otherwise.
-- `msgWait(int channel)` - wait until there is a message to be received in the given channel (actually an inline sub that uses `msgCheck` and not an instruction)  
-  
-More detailed explanation of enemy IDs vs enemy iterators can be found [here](EnmIdIter.md).  
+- `msgWait(int channel)` - wait until there is a message to be received in the given channel (actually an inline sub that uses `msgCheck` and not an instruction)
+
+More detailed explanation of enemy IDs vs enemy iterators can be found [here](EnmIdIter.md).
 In all following instructions, every time there is a variable parameter that gets set to some sort of return value, any non-variable parameter can be given to ignore the return value.
 - `enmClosest(int &varId, float &varDist, float x, float y)` - sets `varId` to ID of the enemy that's closest to the given (`x`, `y`) coordinates, and `varDist` to the distance itself. Ignores enemies that are intangible (flag 32) or have no hurtbox (flag 1).
 - `enmDamage(int id, int dmg [, int isBomb])` - unconditionally deal `dmg` damage to the enemy with the given ID. The third, optional parameter specifies whether the damage should be treated as bomb damage (that is, not get dealt when the enemy has bomb shield and get affected by the bomb damage multiplier).
