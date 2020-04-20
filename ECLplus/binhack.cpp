@@ -66,11 +66,6 @@ CONST BINHACK binhacks[] = {
         sizeof(binhackNop10)
     },
     {
-        PLAYER_SPEED_NOP,
-        binhackNop10,
-        sizeof(binhackNop10)
-    },
-    {
         MAINLOOP_CODECAVE,
         binhackMainLoop,
         sizeof(binhackMainLoop)
