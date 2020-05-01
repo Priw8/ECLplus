@@ -34,7 +34,13 @@ enum INS2000 {
     INS_TEXT_FONT,
     INS_TEXT_ANCHOR,
     INS_TEXT_RESET,
-    INS_TEXT_SHADOW
+    INS_TEXT_SHADOW,
+    INS_GET_PTR_INT,
+    INS_GET_PTR_FLOAT,
+    INS_DEREF_INT,
+    INS_DEREF_FLOAT,
+    INS_WRITE_INT,
+    INS_WRITE_FLOAT
 };
 
 /* INS_2000 series: general debug utilities */
