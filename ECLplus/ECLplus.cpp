@@ -25,29 +25,36 @@
 #include "binhack.h"
 
 /* Executes an extra ECL instruction, called by the modified game. */
-VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
-#ifdef DEV
+static VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
     CHAR buf[256];
-#endif
     BOOL success;
-    if (ins->id >= 2000 && ins->id < 2100) {
-        success = ins_2000(enm, ins);
-    } else if (ins->id >= 2100 && ins->id < 2200) {
-        success = ins_2100(enm, ins);
-    } else if (ins->id >= 2200 && ins->id < 2300) {
-        success = ins_2200(enm, ins);
-    }
-#ifdef DEV
-    else {
-        success = TRUE;
-        snprintf(buf, 256, "instruction out of range: %d", ins->id);
+    /* Since some instructions work on pointers passed directly from ECL,
+     * possible access violation exceptions should be caught and display some basic information,
+     * instead of the game just crashing. */
+    __try {
+        if (ins->id >= 2000 && ins->id < 2100) {
+            success = ins_2000(enm, ins);
+        } else if (ins->id >= 2100 && ins->id < 2200) {
+            success = ins_2100(enm, ins);
+        } else if (ins->id >= 2200 && ins->id < 2300) {
+            success = ins_2200(enm, ins);
+        }
+    #ifdef DEV
+        else {
+            success = TRUE;
+            snprintf(buf, sizeof(buf), "instruction out of range: %d", ins->id);
+            EclMsg(buf);
+        }
+        if (!success) {
+            snprintf(buf, sizeof(buf), "bad instruction number: %d", ins->id);
+            EclMsg(buf);
+        }
+    #endif
+    } __except(EXCEPTION_EXECUTE_HANDLER) {
+        snprintf(buf, sizeof(buf), "SEH exception in ins_%d: %#010x\n"
+            "An attempt to continue running will be made, but it might fail horribly.", ins->id, GetExceptionCode());
         EclMsg(buf);
     }
-    if (!success) {
-        snprintf(buf, 256, "bad instruction number: %d", ins->id);
-        EclMsg(buf);
-    }
-#endif
 }
 
 DWORD __stdcall IntVarSwitch(ENEMY* enm, DWORD var, DWORD type) {
@@ -134,6 +141,25 @@ DECLSPEC_NOINLINE FLOAT* GetFloatArgAddr(ENEMY* enm, DWORD n) {
         mov res, eax
     }
     return res;
+}
+
+VOID EclStackPushInt(ECLCTX* ctx, INSTR* instr, LONG val) {
+    DWORD prevSp = EclStackShiftPopCnt(ctx, instr, 8);
+    EclStackGet(ctx, prevSp)->S = 'i';
+    EclStackGet(ctx, prevSp + 4)->S = val;
+}
+
+VOID EclStackPushFloat(ECLCTX* ctx, INSTR* instr, FLOAT val) {
+    DWORD prevSp = EclStackShiftPopCnt(ctx, instr, 8);
+    EclStackGet(ctx, prevSp)->S = 'f';
+    EclStackGet(ctx, prevSp + 4)->f = val;
+}
+
+DWORD EclStackShiftPopCnt(ECLCTX* ctx, INSTR* instr, DWORD cnt) {
+    DWORD sp = ctx->sp;
+    memmove(EclStackGet(ctx, sp - instr->popCnt + cnt), EclStackGet(ctx, sp - instr->popCnt), instr->popCnt);
+    ctx->sp += cnt;
+    return sp - instr->popCnt;
 }
 
 VOID InitConsole() {

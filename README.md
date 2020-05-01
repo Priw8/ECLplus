@@ -28,6 +28,12 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 - `spellSetCapture(int cap)` - change current spell's capture state, `0` will set bonus to "failed", any other value will allow capturing the spell. Does NOT set the ECL `CAPTURE` variable to 0.
 - `spellSetBonus(int bonus)` - set both max spell bonus and current bonus of the current spell to the given value.
 - `spellSetBonusNow(int bonus)` - set only the current bonus of the current spell. This means that the speed at which the bonus decreases will still be determined by the old max spell bonus value.
+- `int addrS(intvar a)` - returns a pointer to the given integer variable.
+- `int addrf(floatvar a)` - returns a pointer to the given float variable.  
+- `int derefS(int ptr)` - returns the value at the given memory address as an integer (doesn't check if address is valid).
+- `float dereff(int ptr)` - returns the value at the given memory address as a float (doesn't check if address is valid).
+- `writeS(int ptr, int val)` - write the given int value at the given memory address (doesn't check if address is valid).
+- `writef(int ptr, float val)` - write the given float value at the given memory address (doesn't check if address is valid).
 - `playSoundPos(int sound, float x)` - play a sound effect at the absolute position `x` (game coordinates); it will be panned accordingly.
 
 **ins_2100 series: player manipulation**

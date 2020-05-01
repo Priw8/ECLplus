@@ -170,8 +170,28 @@ BOOL ins_2000(ENEMY* enm, INSTR* ins) {
             GameSpell->bonus = GetIntArg(enm, 0);
         }
         break;
+<<<<<<< HEAD
     case INS_SOUND_PANNED:
         PlaySoundPanned(GetIntArg(enm, 0), GetFloatArg(enm, 1));
+=======
+    case INS_GET_PTR_INT:
+        EclStackPushInt(enm->full->eclCtx, ins, (LONG)GetIntArgAddr(enm, 0));
+        break;
+    case INS_GET_PTR_FLOAT:
+        EclStackPushInt(enm->full->eclCtx, ins, (LONG)GetFloatArgAddr(enm, 0));
+        break;
+    case INS_DEREF_INT:
+        EclStackPushInt(enm->full->eclCtx, ins, *(LONG*)GetIntArg(enm, 0));
+        break;
+    case INS_DEREF_FLOAT:
+        EclStackPushFloat(enm->full->eclCtx, ins, *(FLOAT*)GetIntArg(enm, 0));
+        break;
+    case INS_WRITE_INT:
+        *((LONG*)GetIntArg(enm, 0)) = GetIntArg(enm, 1);
+        break;
+    case INS_WRITE_FLOAT:
+        *((FLOAT*)GetIntArg(enm, 0)) = GetFloatArg(enm, 1);
+>>>>>>> add things for pushing vals to stack, pointer-related instrs
         break;
     default:
         return FALSE;

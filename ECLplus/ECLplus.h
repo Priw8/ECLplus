@@ -70,6 +70,7 @@ typedef struct {
 } PARAMD;
 #pragma pack(pop)
 
+typedef struct ENEMYFULL ENEMYFULL;
 #pragma pack(push, 1)
 typedef struct ENEMY {
     CHAR pad0[0x44];
@@ -97,16 +98,35 @@ typedef struct ENEMY {
     DWORD flags;
 
     #define lpad4 (lpad3 + sizeof(pad3) + sizeof(flags) + sizeof(bombInvuln))
-    CHAR pad4[0x4554 - lpad4];
+    CHAR pad4[0x44D8 - lpad4];
+    ENEMYFULL* full;
+
+    #define lpad5 (lpad4 + sizeof(pad4) + sizeof(full))
+    CHAR pad5[0x4554 - lpad5];
     DWORD id;
 } ENEMY;
 #pragma pack(pop)
+
+#pragma pack(push, 1)
+typedef struct ECLCTX {
+    CHAR unknown[0x0C];
+    CHAR stack[0x1000];
+    DWORD sp;
+    DWORD bp;
+} ECLCTX;
+#pragma pack(pop)
+/* Wack thing about ECL stack: the sp and bp are not indices of the stack array,
+ * but raw offsets in bytes from the beginning of the array... So there's this: */
+#define EclStackGet(ctx, ptr) ((MIXEDVAL*)(ctx->stack + ptr))
 
 /* I think there is some baseObj class that enemy class is derived from. ENEMYFULL represents the full
  * enemy class including the baseObj, while ENEMY is just the enemy without the base class.  */
 #pragma pack(push, 1)
 typedef struct ENEMYFULL {
-    CHAR pad[0x120C];
+    CHAR pad1[0x0C];
+    ECLCTX* eclCtx;
+    
+    CHAR pad2[0x120C - 0x0C - sizeof(eclCtx)];
     ENEMY enm;
 } ENEMYFULL;
 #pragma pack(pop)
@@ -167,9 +187,6 @@ typedef double DOUBLE;
 #define Gamemode *(DWORD*)(0x004B61D0)
 #define GamemodeNext *(DWORD*)(0x004B61D4)
 
-// #define GetVm(x) (DWORD*)(*((DWORD*)(*(x+0x000044D8))+0x0C))
-
-
 /* Writes pointers to DLL functions to game's memory. */
 VOID init();
 
@@ -201,6 +218,19 @@ LONG* GetIntArgAddr(ENEMY* enm, DWORD n);
 
 /* Returns a pointer to the float variable passed as the nth argument. */
 FLOAT* GetFloatArgAddr(ENEMY* enm, DWORD n);
+
+/* Push integer to ECL stack (moves the values that will be removed via
+ * instr->popCnt further and inserts the integer before them) */
+VOID EclStackPushInt(ECLCTX* ctx, INSTR* instr, LONG val);
+
+/* Push float to ECL stack (moves the values that will be removed via
+ * instr->popCnt further and inserts the float before them) */
+VOID EclStackPushFloat(ECLCTX* ctx, INSTR* instr, FLOAT val);
+
+/* Move values that will be removed via instr->popCnt by cnt bytes.
+ * This creates a gap in the stack, and the offset of the gap from the
+ * beginning of the stack is returned. */
+DWORD EclStackShiftPopCnt(ECLCTX* ctx, INSTR* instr, DWORD cnt);
 
 /* Shows a message box of the given content, */
 inline VOID EclMsg(CONST CHAR* str) {
