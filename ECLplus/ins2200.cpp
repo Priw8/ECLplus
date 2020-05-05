@@ -147,8 +147,6 @@ static BOOL CollisionCheckCircleRect(COLLISION_CIRCLE *circ, COLLISION_RECT *rec
     }
 }
 
-void (*COLLIDE_RECT_RECT)() = (void (*)())0x404320;
-
 static __declspec(naked) BOOL __stdcall CollisionCheckRectRect(COLLISION_RECT *a, COLLISION_RECT *b) {
     __asm {
         push  ebp
