@@ -28,6 +28,7 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 - `spellSetCapture(int cap)` - change current spell's capture state, `0` will set bonus to "failed", any other value will allow capturing the spell. Does NOT set the ECL `CAPTURE` variable to 0.
 - `spellSetBonus(int bonus)` - set both max spell bonus and current bonus of the current spell to the given value.
 - `spellSetBonusNow(int bonus)` - set only the current bonus of the current spell. This means that the speed at which the bonus decreases will still be determined by the old max spell bonus value.
+- `playSoundPos(int sound, float x)` - play a sound effect at the absolute position `x` (game coordinates); it will be panned accordingly.
 
 **ins_2100 series: player manipulation**  
 - `playerPos(float x, float y)` - move the player to the given coordinates.

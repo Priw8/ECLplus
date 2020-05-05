@@ -175,7 +175,9 @@ static __declspec(naked) BOOL __stdcall CollisionCheckRectRect(COLLISION_RECT *a
         mov   eax, [ecx + 0x10] // b.rotation
         mov   [esp + 0x00], eax
 
-        call  [COLLIDE_RECT_RECT]
+        mov   eax, 0x404320
+        call  eax
+
         mov   esp, ebp
         pop   ebp
         ret   0x8
