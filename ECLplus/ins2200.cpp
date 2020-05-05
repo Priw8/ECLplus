@@ -71,14 +71,181 @@ static MESSAGE* MsgReceive(LONG channel, BOOL pop) {
     return NULL;
 }
 
-static LONG ApplyBombShields(LONG dmg, ENEMY* attacker, ENEMY* target, INSTR* ins, DWORD paramN) {
-    if (ins->paramCount <= paramN || !GetIntArg(attacker, paramN))
+static DWORD GetOptionalIntArg(INSTR* ins, ENEMY* enm, DWORD paramN, DWORD default_) {
+    return (ins->paramCount <= paramN) ? default_ : GetIntArg(enm, paramN);
+}
+
+static LONG ApplyBombShields(LONG dmg, ENEMY* target, DWORD isBomb) {
+    if (!isBomb)
         return dmg;
 
     if (target->flags & FLAG_BOMBSHIELD)
         return 0;
 
     return (LONG)((FLOAT)dmg * target->bombInvuln);
+}
+
+struct COLLISION_CIRCLE {
+    FLOAT x;
+    FLOAT y;
+    FLOAT radius;
+};
+
+struct COLLISION_RECT {
+    FLOAT x;
+    FLOAT y;
+    FLOAT w;
+    FLOAT h;
+    FLOAT rotation;
+};
+
+struct COLLISION_SHAPE {
+    BOOL is_rect;
+    union {
+        COLLISION_CIRCLE circ;
+        COLLISION_RECT rect;
+        POINTFLOAT pos;
+    } u;
+};
+
+static BOOL CollisionCheckCircleCircle(COLLISION_CIRCLE *a, COLLISION_CIRCLE *b) {
+    FLOAT x = b->x - a->x;
+    FLOAT y = b->y - a->y;
+    FLOAT effectiveRadius = a->radius + b->radius;
+    return x * x + y * y < effectiveRadius * effectiveRadius;
+}
+
+static BOOL CollisionCheckCircleRect(COLLISION_CIRCLE *circ, COLLISION_RECT *rect) {
+    // translate so that the rectangle is centered on the origin
+    FLOAT xDiff = circ->x - rect->x;
+    FLOAT yDiff = circ->y - rect->y;
+
+    // rotate so that rectangle is on the axes
+    if (rect->rotation != 0) {
+        FLOAT c = cos(-rect->rotation);
+        FLOAT s = sin(-rect->rotation);
+        FLOAT xDiffNew = xDiff * c - yDiff * s;
+        yDiff = xDiff * s + yDiff * c;
+        xDiff = xDiffNew;
+    }
+
+    // apply mirror symmetry to move circle to upper right quadrant
+    FLOAT xDist = fabsf(xDiff);
+    FLOAT yDist = fabsf(yDiff);
+
+    if (xDist > 0.5f * rect->w + circ->radius) return FALSE;
+    else if (yDist > 0.5f * rect->h + circ->radius) return FALSE;
+
+    // overlapping a single edge?
+    else if (xDist <= 0.5 * rect->w) return TRUE;
+    else if (yDist <= 0.5 * rect->h) return TRUE;
+
+    else {
+        // overlapping a corner?
+        FLOAT distSq = powf(xDist - 0.5f * rect->w, 2.0f) + powf(yDist - 0.5f * rect->h, 2.0f);
+        return distSq <= powf(circ->radius, 2.0f);
+    }
+}
+
+void (*COLLIDE_RECT_RECT)() = (void (*)())0x404320;
+
+static __declspec(naked) BOOL __stdcall CollisionCheckRectRect(COLLISION_RECT *a, COLLISION_RECT *b) {
+    __asm {
+        push  ebp
+        mov   ebp, esp
+        sub   esp, 0x18
+
+        mov   ecx, [ebp + 0x08] // a
+        mov   eax, [ecx + 0x00] // a.x
+        mov   [esp + 0x04], eax
+        mov   eax, [ecx + 0x04] // a.y
+        mov   [esp + 0x08], eax
+        mov   eax, [ecx + 0x08] // a.w
+        mov   [esp + 0x0c], eax
+        mov   eax, [ecx + 0x0c] // a.h
+        mov   [esp + 0x10], eax
+        mov   eax, [ecx + 0x10] // a.rotation
+        mov   [esp + 0x14], eax
+
+        mov   ecx, [ebp + 0x0c] // b
+        movss xmm0, [ecx + 0x00] // b.x
+        movss xmm1, [ecx + 0x04] // b.y
+        movss xmm2, [ecx + 0x08] // b.w
+        movss xmm3, [ecx + 0x0c] // b.h
+        mov   eax, [ecx + 0x10] // b.rotation
+        mov   [esp + 0x00], eax
+
+        call  [COLLIDE_RECT_RECT]
+        mov   esp, ebp
+        pop   ebp
+        ret   0x8
+    }
+}
+
+static void GetEnemyCollisionShape(COLLISION_SHAPE *shape, const ENEMY *enm) {
+    if (enm->flags & FLAG_RECT_HITBOX) {
+        shape->is_rect = true;
+        shape->u.rect = { enm->pos.x, enm->pos.y, enm->hurtbox.x, enm->hurtbox.y, enm->rotation };
+    }
+    else {
+        FLOAT radius = 0.5f * enm->hurtbox.x;
+        shape->is_rect = false;
+        shape->u.circ = { enm->pos.x, enm->pos.y, radius };
+    }
+}
+
+static BOOL CollisionCheck(COLLISION_SHAPE *a, COLLISION_SHAPE *b) {
+    if (a->is_rect) {
+        if (b->is_rect) {
+            return CollisionCheckRectRect(&a->u.rect, &b->u.rect);
+        } else {
+            return CollisionCheckCircleRect(&b->u.circ, &a->u.rect);
+        }
+    } else {
+        if (b->is_rect) {
+            return CollisionCheckCircleRect(&a->u.circ, &b->u.rect);
+        } else {
+            return CollisionCheckCircleCircle(&a->u.circ, &b->u.circ);
+        }
+    }
+}
+
+static LONG DamageEnemiesImpl(COLLISION_SHAPE *dmgShape, LONG dmg, LONG maxcnt, DWORD isBomb) {
+    ENEMYLISTNODE* node = GameEnmMgr->head;
+    DWORD i = 0;
+
+    while(node != NULL) {
+        ENEMY* iterEnm = &node->obj->enm;
+        if (!(iterEnm->flags & (FLAG_INTANGIBLE | FLAG_NO_HURTBOX))) {
+            COLLISION_SHAPE enmShape;
+            GetEnemyCollisionShape(&enmShape, iterEnm);
+
+            if (CollisionCheck(&enmShape, dmgShape)) {
+                enmArr[i] = iterEnm;
+                ++i;
+                if (i == ENMARR_LEN) {
+                    EclMsg("enmDamage: ran out of space for enemies in the preallocated buffer. Why are you using over 2000 real enemies?");
+                    return -1;
+                }
+            }
+        }
+        node = node->next;
+    }
+
+    std::sort(enmArr.begin(), enmArr.begin() + i, [dmgShape](ENEMY* enm1, ENEMY* enm2) {
+        return
+            powf(enm1->pos.x - dmgShape->u.pos.x, 2) + powf(enm1->pos.y - dmgShape->u.pos.y, 2)
+            <
+            powf(enm2->pos.x - dmgShape->u.pos.x, 2) + powf(enm2->pos.y - dmgShape->u.pos.y, 2);
+    });
+
+    LONG cnt = 0;
+    for (DWORD itr = 0; itr < i; ++itr) {
+        if (maxcnt > 0 && cnt >= maxcnt)
+            break;
+        enmArr[itr]->pendingDmg += ApplyBombShields(dmg, enmArr[itr], isBomb);
+        ++cnt;
+    }
 }
 
 BOOL ins_2200(ENEMY* enm, INSTR* ins) {
@@ -158,15 +325,17 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
          * determines whether this is "bomb damage" and bombshield/invluln should take effect. */
         case INS_ENM_DAMAGE: {
             ENEMYFULL* foundEnm = GetEnmById(GetIntArg(enm, 0));
+            DWORD isBomb = GetOptionalIntArg(ins, enm, 2, 0);
             if (foundEnm != NULL) {
-                foundEnm->enm.pendingDmg += ApplyBombShields(GetIntArg(enm, 1), enm, &foundEnm->enm, ins, 2);
+                foundEnm->enm.pendingDmg += ApplyBombShields(GetIntArg(enm, 1), &foundEnm->enm, isBomb);
             }
             break;
         }
         case INS_ENM_DAMAGE_ITER: {
             ENEMYLISTNODE* foundEnm = (ENEMYLISTNODE*)GetIntArg(enm, 0);
+            DWORD isBomb = GetOptionalIntArg(ins, enm, 2, 0);
             if (foundEnm != NULL) {
-                foundEnm->obj->enm.pendingDmg += ApplyBombShields(GetIntArg(enm, 1), enm, &foundEnm->obj->enm, ins, 2);
+                foundEnm->obj->enm.pendingDmg += ApplyBombShields(GetIntArg(enm, 1), &foundEnm->obj->enm, isBomb);
             }
             break;
         }
@@ -174,59 +343,18 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             FLOAT x = GetFloatArg(enm, 1), 
                   y = GetFloatArg(enm, 2),
                   rad = GetFloatArg(enm, 3);
-            FLOAT radSq = powf(rad, 2.0f);
-            LONG cnt = 0;
+
             LONG maxcnt = GetIntArg(enm, 4);
             LONG dmg = GetIntArg(enm, 5);
+            DWORD isBomb = GetOptionalIntArg(ins, enm, 6, 0);
 
-            ENEMYLISTNODE* node = GameEnmMgr->head;
-            DWORD i = 0;
+            COLLISION_SHAPE dmgShape;
+            dmgShape.is_rect = false;
+            dmgShape.u.circ = { x, y, rad };
 
-            while(node != NULL) {
-                ENEMY* iterEnm = &node->obj->enm;
-                if (!(iterEnm->flags & (FLAG_INTANGIBLE | FLAG_NO_HURTBOX))) {
-                    /* Hurtbox is actually a square, unlike the hitbox. */
-                    /* So we have to check circle-rectangle intersection (annoying) */
-                    FLOAT xDist = fabsf(x - iterEnm->pos.x);
-                    FLOAT yDist = fabsf(y - iterEnm->pos.y);
-                    BOOL intersects;
-                    if (xDist > iterEnm->hurtbox.x / 2.0f + rad) intersects = FALSE;
-                    else if (yDist > iterEnm->hurtbox.y / 2.0f + rad) intersects = FALSE;
-
-                    else if (xDist <= iterEnm->hurtbox.x / 2.0f) intersects = TRUE;
-                    else if (yDist <= iterEnm->hurtbox.y / 2.0f) intersects = TRUE;
-
-                    else {
-                        FLOAT distSq = powf(xDist - iterEnm->hurtbox.x / 2.0f, 2.0f) + powf(yDist - iterEnm->hurtbox.y / 2.0f, 2.0f);
-                        intersects = distSq <= radSq;
-                    }
-
-                    if (intersects) {
-                        enmArr[i] = iterEnm;
-                        ++i;
-                        if (i == ENMARR_LEN) {
-                            EclMsg("enmDamageRad: ran out of space for enemies in the preallocated buffer. Why are you using over 2000 real enemies?");
-                            return TRUE;
-                        }
-                    }
-                }
-                node = node->next;
-            }
-
-            std::sort(enmArr.begin(), enmArr.begin() + i, [x, y](ENEMY* enm1, ENEMY* enm2) {
-                return
-                    powf(enm1->pos.x - x, 2) + powf(enm1->pos.y - y, 2)
-                    <
-                    powf(enm2->pos.x - x, 2) + powf(enm2->pos.y - y, 2);
-            });
-
-
-            for (DWORD itr = 0; itr < i; ++itr) {
-                if (maxcnt > 0 && cnt >= maxcnt)
-                    break;
-                enmArr[itr]->pendingDmg += ApplyBombShields(dmg, enm, enmArr[itr], ins, 6);
-                ++cnt;
-            }
+            LONG cnt = DamageEnemiesImpl(&dmgShape, dmg, maxcnt, isBomb);
+            if (cnt < 0)
+                return TRUE; // error
 
             LONG* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) *ptr = cnt;
@@ -239,45 +367,41 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
                   w = GetFloatArg(enm, 3),
                   h = GetFloatArg(enm, 4);
 
-            LONG cnt = 0;
             LONG maxcnt = GetIntArg(enm, 5);
             LONG dmg = GetIntArg(enm, 6);
+            DWORD isBomb = GetOptionalIntArg(ins, enm, 7, 0);
 
-            ENEMYLISTNODE* node = GameEnmMgr->head;
-            DWORD i = 0;
+            COLLISION_SHAPE dmgShape;
+            dmgShape.is_rect = true;
+            dmgShape.u.rect = { x, y, w, h, 0.0 };
 
-            while (node != NULL) {
-                ENEMY* iterEnm = &node->obj->enm;
-                if (
-                    !(iterEnm->flags & (FLAG_INTANGIBLE | FLAG_NO_HURTBOX)) &&
-                    x - w / 2.0f < iterEnm->pos.x + iterEnm->hurtbox.x / 2.0f &&
-                    x + w / 2.0f > iterEnm->pos.x - iterEnm->hurtbox.x / 2.0f &&
-                    y - h / 2.0f < iterEnm->pos.y + iterEnm->hurtbox.y / 2.0f &&
-                    y + h / 2.0f > iterEnm->pos.y - iterEnm->hurtbox.y / 2.0f
-                ) {
-                    enmArr[i] = iterEnm;
-                    ++i;
-                    if (i == ENMARR_LEN) {
-                        EclMsg("enmDamageRect: ran out of space for enemies in the preallocated buffer. Why are you using over 2000 real enemies?");
-                        return TRUE;
-                    }
-                }
-                node = node->next;
-            }
+            LONG cnt = DamageEnemiesImpl(&dmgShape, dmg, maxcnt, isBomb);
+            if (cnt < 0)
+                return TRUE; // error
 
-            std::sort(enmArr.begin(), enmArr.begin() + i, [x, y](ENEMY* enm1, ENEMY* enm2) {
-                return
-                    powf(enm1->pos.x - x, 2) + powf(enm1->pos.y - y, 2)
-                    <
-                    powf(enm2->pos.x - x, 2) + powf(enm2->pos.y - y, 2);
-            });
+            LONG* ptr = GetIntArgAddr(enm, 0);
+            if (ptr != NULL) *ptr = cnt;
 
-            for (DWORD itr = 0; itr < i; ++itr) {
-                if (maxcnt > 0 && cnt >= maxcnt)
-                    break;
-                enmArr[itr]->pendingDmg += ApplyBombShields(dmg, enm, enmArr[itr], ins, 7);
-                ++cnt;
-            }
+            break;
+        }
+        case INS_ENM_DAMAGE_RECT_ROT: {
+            FLOAT x = GetFloatArg(enm, 1),
+                  y = GetFloatArg(enm, 2),
+                  w = GetFloatArg(enm, 3),
+                  h = GetFloatArg(enm, 4),
+                  rot = GetFloatArg(enm, 5);
+
+            LONG maxcnt = GetIntArg(enm, 6);
+            LONG dmg = GetIntArg(enm, 7);
+            DWORD isBomb = GetOptionalIntArg(ins, enm, 8, 0);
+
+            COLLISION_SHAPE dmgShape;
+            dmgShape.is_rect = true;
+            dmgShape.u.rect = { x, y, w, h, rot };
+
+            LONG cnt = DamageEnemiesImpl(&dmgShape, dmg, maxcnt, isBomb);
+            if (cnt < 0)
+                return TRUE; // error
 
             LONG* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) *ptr = cnt;
