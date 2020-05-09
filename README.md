@@ -28,6 +28,7 @@ Simply including the content of the [LICENSE.txt](LICENSE.txt) file in the mod w
 - `spellSetCapture(int cap)` - change current spell's capture state, `0` will set bonus to "failed", any other value will allow capturing the spell. Does NOT set the ECL `CAPTURE` variable to 0.
 - `spellSetBonus(int bonus)` - set both max spell bonus and current bonus of the current spell to the given value.
 - `spellSetBonusNow(int bonus)` - set only the current bonus of the current spell. This means that the speed at which the bonus decreases will still be determined by the old max spell bonus value.
+- `playSoundPos(int sound, float x)` - play a sound effect at the absolute position `x` (game coordinates); it will be panned accordingly.
 
 **ins_2100 series: player manipulation**
 - `playerPos(float x, float y)` - move the player to the given coordinates.
@@ -60,6 +61,7 @@ In all following instructions, every time there is a variable parameter that get
 - `enmDamageIter(int iter, int dmg, [, int isBomb])` - same as above, but uses an iterator instead of ID.
 - `enmDamageRad(int &varCnt, float x, float y, float r, int maxCnt, int dmg [, int isBomb])` - deal `dmg` damage enemies within the circle with center at coordinates (`x`, `y`) and radius `r`. Maximum amount of enemies that can be damaged is determined by `maxCnt` (set to `-1` for unlimited amount), prioritizing damaging enemies closer to the center of the circle. The amount of the damaged enemies is written to `varCnt`. The optional `isBomb` works the same as in the previous instructions.
 - `enmDamageRect(int &varCnt, float x, float y, float w, float h, int maxCnt, int dmg [, int isBomb])` - same as above, but damages a rect of width `w` and height `h` with center at coordinates (`x`, `y`) instead of a circle.
+- `enmDamageRectRot(int &varCnt, float x, float y, float w, float h, float rot, int maxCnt, int dmg [, int isBomb])` - same as above, but the rectangle can be additionally rotated by `rot` radians.
 - `enmIterate(int &varIterator, int prevIterator)` - used to iterate over the enemy list. If `prevIterator` is 0, then `varIterator` is set the the iterator of the first enemy. If it's not 0, then it must be a valid iterator, and in this case `varIterator` will be set to iterator of the enemy that's after `prevIterator`.
 - `enmIdIter(int &varId, int iter)` - sets `varId` to ID value of enemy that iterator `iter` refers to.
 - `enmIterId(int &varIter, int id)` - sets `varIter` to the iterator that refers to enemy with the given ID.

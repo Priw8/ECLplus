@@ -32,6 +32,7 @@
 2012 drawAnchor
 2013 drawReset
 2014 drawShadow
+2021 playSoundPos
 
 2100 playerPos
 2101 playerKill
@@ -68,6 +69,7 @@
 2222 enmPosIter
 2223 enmBombInvuln
 2224 enmBombInvulnIter
+2225 enmDamageRectRot
 
 !gvar_names
 -8000 INPUT

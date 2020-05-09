@@ -78,8 +78,10 @@ typedef struct ENEMY {
     #define lpadHurtbox (sizeof(pad0) + sizeof(pos))
     CHAR padHurtbox[0x110 - lpadHurtbox];
     POINTFLOAT hurtbox;
+    POINTFLOAT hitbox;
+    FLOAT rotation;
 
-    #define lpad1 (lpadHurtbox + sizeof(padHurtbox) + sizeof(hurtbox))
+    #define lpad1 (lpadHurtbox + sizeof(padHurtbox) + sizeof(hurtbox) + sizeof(hitbox) + sizeof(rotation))
     CHAR pad1[0x3F54 - lpad1];
     LONG pendingDmg;
 

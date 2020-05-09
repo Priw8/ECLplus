@@ -63,6 +63,24 @@ static VOID EclPrintf(CHAR* buf, DWORD bufSize, INSTR* ins, ENEMY* enm) {
     vsnprintf(buf, bufSize, str, (va_list)args);
 }
 
+static __declspec(naked) void __stdcall PlaySoundPanned(DWORD sound, FLOAT x) {
+    __asm {
+        // another function with an unrecognizable calling convention...
+        push  ebp
+        mov   ebp, esp
+
+        push  dword ptr [ebp + 0x08] // sound
+        movss xmm2, [ebp + 0x0c] // x
+
+        mov   eax, 0x4654f0
+        call  eax
+
+        mov   esp, ebp
+        pop   ebp
+        ret   0x8
+    }
+}
+
 BOOL ins_2000(ENEMY* enm, INSTR* ins) {
     CHAR buf[512];
     switch (ins->id) {
@@ -151,6 +169,9 @@ BOOL ins_2000(ENEMY* enm, INSTR* ins) {
         if (GameSpell) {
             GameSpell->bonus = GetIntArg(enm, 0);
         }
+        break;
+    case INS_SOUND_PANNED:
+        PlaySoundPanned(GetIntArg(enm, 0), GetFloatArg(enm, 1));
         break;
     default:
         return FALSE;

@@ -34,7 +34,8 @@ enum INS2000 {
     INS_TEXT_FONT,
     INS_TEXT_ANCHOR,
     INS_TEXT_RESET,
-    INS_TEXT_SHADOW
+    INS_TEXT_SHADOW,
+    INS_SOUND_PANNED = 2021,
 };
 
 /* INS_2000 series: general debug utilities */
