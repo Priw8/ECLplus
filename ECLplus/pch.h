@@ -25,6 +25,7 @@
 #include <map>
 #include <list>
 #include <array>
+#include <vector>
 #include <algorithm>
 #include <windows.h>
 

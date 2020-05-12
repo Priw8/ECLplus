@@ -260,6 +260,10 @@ inline VOID EclPrintRender(FLOAT x, FLOAT y, CONST CHAR* format, DWORD len, CHAR
     }
 }
 
+void __stdcall MainLoop();
+DWORD __stdcall IntVarSwitch(ENEMY* enm, DWORD var, DWORD type);
+VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins);
+
 /* Enemy flags */
 #define FLAG_NO_HURTBOX 1
 #define FLAG_NO_HITBOX 2
