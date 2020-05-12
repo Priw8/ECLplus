@@ -70,6 +70,19 @@ typedef struct {
 } PARAMD;
 #pragma pack(pop)
 
+/* Claim some space from the setNext data structures. Nobody really needs subroutine
+ * names that are 63 characters long...  */
+#pragma pack(push, 1)
+typedef struct ENEMY_SETNEXT {
+    DWORD life;
+    DWORD time;
+    CHAR subName1[60];
+    DWORD extraField1;
+    CHAR subName2[60];
+    DWORD extraField2;
+} ENEMY_SETNEXT;
+#pragma pack(pop)
+
 #pragma pack(push, 1)
 typedef struct ENEMY {
     CHAR pad0[0x44];
@@ -89,24 +102,53 @@ typedef struct ENEMY {
     CHAR pad2[0x3F74 - lpad2];
     LONG hp;
     LONG hpMax;
-    LONG hpTreshold;
+    LONG hpThreshold;
 
-    #define lpad3 (lpad2 + sizeof(pad2) + sizeof(hp) + sizeof(hpMax) + sizeof(hpTreshold))
+    #define lpad3 (lpad2 + sizeof(pad2) + sizeof(hp) + sizeof(hpMax) + sizeof(hpThreshold))
     CHAR pad3[0x407C - lpad3];
     FLOAT bombInvuln;
     DWORD flags;
 
-    #define lpad4 (lpad3 + sizeof(pad3) + sizeof(flags) + sizeof(bombInvuln))
-    CHAR pad4[0x4554 - lpad4];
+    #define lpad4 (lpad3 + sizeof(pad3) + sizeof(bombInvuln) + sizeof(flags))
+    CHAR pad4[0x4098 - lpad4];
+    ENEMY_SETNEXT setNext[8];
+
+    #define lpad5 (lpad4 + sizeof(pad4) + sizeof(setNext))
+    CHAR pad5[0x4554 - lpad5];
     DWORD id;
 } ENEMY;
+#pragma pack(pop)
+
+// Assign types and names to the extra fields we skimmed off of setNext.
+#define targetRunGroup(mac, enm, value) mac(enm, value, DWORD, 0, extraField1)
+#define nextInRunGroup(mac, enm, value) mac(enm, value, ENEMYFULL*, 0, extraField2)
+#define pendingDmg(mac, enm, value) mac(enm, value, DWORD, 1, extraField1)
+
+// Use these macros to work with them.
+// E.g.  GetExField(enm, pendingDmg)  or  SetExField(enm, targetRunGroup, 0x14)
+#define GetExFieldOffset(fieldMac) (fieldMac(GetExFieldOffset_impl, DUMMY, DUMMY))
+#define GetExFieldAddr(enm, fieldMac) (fieldMac(GetExFieldAddr_impl, (enm), DUMMY))
+#define GetExField(enm, fieldMac) (fieldMac(GetExField_impl, (enm), DUMMY))
+#define SetExField(enm, fieldMac, value) (fieldMac(SetExField_impl, (enm), (value)))
+
+#define GetExFieldOffset_impl(enm, value, T, index, field) (offsetof(ENEMY, setNext) + sizeof(ENEMY_SETNEXT) * index + offsetof(ENEMY_SETNEXT, field))
+#define GetExFieldAddr_impl(enm, value, T, index, field) ((T*)&(enm)->setNext[index].field)
+#define GetExField_impl(enm, value, T, index, field) (*GetExFieldAddr_impl(enm, T, index, field))
+#define SetExField_impl(enm, value, T, index, field) (*GetExFieldAddr_impl(enm, T, index, field) = value)
+
+#pragma pack(push, 1)
+typedef struct ENEMYVTABLE {
+    void* pad[5];
+    void (__thiscall* Destroy)(DWORD);
+} ENEMYVTABLE;
 #pragma pack(pop)
 
 /* I think there is some baseObj class that enemy class is derived from. ENEMYFULL represents the full
  * enemy class including the baseObj, while ENEMY is just the enemy without the base class.  */
 #pragma pack(push, 1)
 typedef struct ENEMYFULL {
-    CHAR pad[0x120C];
+    ENEMYVTABLE* vtable;
+    CHAR pad[0x120C - sizeof(vtable)];
     ENEMY enm;
 } ENEMYFULL;
 #pragma pack(pop)

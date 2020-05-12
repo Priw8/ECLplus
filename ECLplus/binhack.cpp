@@ -142,9 +142,9 @@ void InitBinhacks() {
         cave.Write({ '\xe8' }); // call TALLY_DAMAGE_FROM_PLAYER
         cave.WriteRel((LPCVOID)0x44b090);
         cave.Write({ '\x03', '\x83' });         // add  eax, DWORD PTR[ebx + pendingDmg]
-        cave.WriteDword(offsetof(ENEMY, pendingDmg));
-        cave.Write({ '\xc7', '\x83' });         // mov  DWORD PTR[ebx + 0x3f54], 0x0
-        cave.WriteDword(offsetof(ENEMY, pendingDmg));
+        cave.WriteDword(GetExFieldOffset(pendingDmg));
+        cave.Write({ '\xc7', '\x83' });         // mov  DWORD PTR[ebx + pendingDmg], 0x0
+        cave.WriteDword(GetExFieldOffset(pendingDmg));
         cave.WriteDword(0);
         cave.Write({ '\xE9' });                 // jmp  0x41fa1a
         cave.WriteRel((LPVOID)0x41fa1a);

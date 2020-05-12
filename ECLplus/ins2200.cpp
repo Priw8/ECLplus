@@ -243,7 +243,7 @@ static LONG DamageEnemiesImpl(COLLISION_SHAPE *dmgShape, LONG dmg, LONG maxcnt, 
     for (DWORD itr = 0; itr < i; ++itr) {
         if (maxcnt > 0 && cnt >= maxcnt)
             break;
-        enmArr[itr]->pendingDmg += ApplyBombShields(dmg, enmArr[itr], isBomb);
+        *GetExFieldAddr(enmArr[itr], pendingDmg) += ApplyBombShields(dmg, enmArr[itr], isBomb);
         ++cnt;
     }
     return cnt;
@@ -328,7 +328,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             ENEMYFULL* foundEnm = GetEnmById(GetIntArg(enm, 0));
             DWORD isBomb = GetOptionalIntArg(ins, enm, 2, 0);
             if (foundEnm != NULL) {
-                foundEnm->enm.pendingDmg += ApplyBombShields(GetIntArg(enm, 1), &foundEnm->enm, isBomb);
+                *GetExFieldAddr(&foundEnm->enm, pendingDmg) += ApplyBombShields(GetIntArg(enm, 1), &foundEnm->enm, isBomb);
             }
             break;
         }
@@ -336,7 +336,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             ENEMYLISTNODE* foundEnm = (ENEMYLISTNODE*)GetIntArg(enm, 0);
             DWORD isBomb = GetOptionalIntArg(ins, enm, 2, 0);
             if (foundEnm != NULL) {
-                foundEnm->obj->enm.pendingDmg += ApplyBombShields(GetIntArg(enm, 1), &foundEnm->obj->enm, isBomb);
+                *GetExFieldAddr(&foundEnm->obj->enm, pendingDmg) += ApplyBombShields(GetIntArg(enm, 1), &foundEnm->obj->enm, isBomb);
             }
             break;
         }
