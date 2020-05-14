@@ -1,36 +1,22 @@
 #pragma once
 
 #include "pch.h"
+#include "ECLplus.h"
 
-/*  
-    *_ADDR - location where pointer to a DLL function is written
-    *_CODECAVE - empty space where our code is written, often calls function in *_ADDR
-    *_JUMP - where to overwrite part of game's code to jump to the codecave
-*/
+#define FUNC_POINTERS_BEGIN ((ECLPLUS_FUNCS*)0x00499FE0)
 
-#define INS_SWITCH_ADDR ((LPVOID)0x00499FE8)
-#define INS_SWITCH_CODECAVE ((LPVOID)0x00499EBA)
-#define INS_SWITCH_JUMP ((LPVOID)0x004211AB)
+#pragma pack(push, 1)
+struct ECLPLUS_FUNCS {
+    VOID(__stdcall* mainLoop)();
+    DWORD(__stdcall* intVarSwitch)(ENEMY* enm, DWORD var, DWORD type);
+    VOID(__stdcall* insSwitch)(ENEMY* enm, INSTR* ins);
 
-#define INTVAR_SWITCH_ADDR ((LPVOID)0x00499FE4)
-#define INTVAR_VAL_SWITCH_JUMP ((LPVOID)0x00427524)
-#define INTVAR_VAL_SWITCH_CODECAVE ((LPVOID)0x00499ECA)
-#define INTVAR_ADDR_SWITCH_JUMP ((LPVOID)0x00427Cf1)
-#define INTVAR_ADDR_SWITCH_CODECAVE ((LPVOID)0x00499EDB)
+    ECLPLUS_FUNCS()
+        : mainLoop(MainLoop)
+        , intVarSwitch(IntVarSwitch)
+        , insSwitch(InsSwitch)
+    {}
+};
+#pragma pack(pop)
 
-#define ENMDMG_CODECAVE ((LPVOID)0x00499EEE)
-#define ENMDMG_JUMP ((LPVOID)0x0041FA15)
-
-#define PLAYER_DAMAGE_NOP ((LPVOID)0x0041E94F)
-
-#define MAINLOOP_ADDR ((LPVOID)0x00499FE0)
-#define MAINLOOP_CODECAVE ((LPVOID)0x00499F0A)
-#define MAINLOOP_JUMP ((LPVOID)0x004612DE)
-
-typedef struct {
-    LPVOID addr;
-    CONST UCHAR* code;
-    DWORD codelen;
-} BINHACK;
-
-extern CONST BINHACK binhacks[];
+void InitBinhacks();

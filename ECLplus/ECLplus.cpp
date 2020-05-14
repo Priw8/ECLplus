@@ -25,7 +25,7 @@
 #include "binhack.h"
 
 /* Executes an extra ECL instruction, called by the modified game. */
-static VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
+VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
 #ifdef DEV
     CHAR buf[256];
 #endif
@@ -50,7 +50,7 @@ static VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
 #endif
 }
 
-static DWORD __stdcall IntVarSwitch(ENEMY* enm, DWORD var, DWORD type) {
+DWORD __stdcall IntVarSwitch(ENEMY* enm, DWORD var, DWORD type) {
     if (type == 0)
         return IntVarGetVal(enm, var);
     else
@@ -146,7 +146,7 @@ VOID InitConsole() {
     EclPrint("ECLplus v0.4 by Priw8\n");
 }
 
-static VOID MainLoop() {
+VOID __stdcall MainLoop() {
     /* Called every frame. */
 }
 
@@ -154,28 +154,6 @@ VOID init() {
 #ifdef DEV
     InitConsole();
 #endif
-    DWORD old;
-    /* Some code of the game has to be overwritten to call DLL functions. */
-    /* ECL instructions: */
-    VirtualProtect(INS_SWITCH_ADDR, 4, PAGE_EXECUTE_READWRITE, &old);
-    *(LPVOID*)INS_SWITCH_ADDR = (LPVOID)InsSwitch;
-    VirtualProtect(INS_SWITCH_ADDR, 4, old, &old);
-
-    VirtualProtect(INTVAR_SWITCH_ADDR, 4, PAGE_EXECUTE_READWRITE, &old);
-    *(LPVOID*)INTVAR_SWITCH_ADDR = (LPVOID)IntVarSwitch;
-    VirtualProtect(INTVAR_SWITCH_ADDR, 4, old, &old);
-
-    VirtualProtect(MAINLOOP_ADDR, 4, PAGE_EXECUTE_READWRITE, &old);
-    *(LPVOID*)MAINLOOP_ADDR = (LPVOID)MainLoop;
-    VirtualProtect(MAINLOOP_ADDR, 4, old, &old);
-
-    DWORD i = 0;
-    while(binhacks[i].addr) {
-        CONST BINHACK* hack = &binhacks[i];
-        VirtualProtect(hack->addr, hack->codelen, PAGE_READWRITE, &old);
-        CopyMemory(hack->addr, hack->code, hack->codelen);
-        VirtualProtect(hack->addr, hack->codelen, old, &old);
-        ++i;
-    }
+    InitBinhacks();
 }
 
