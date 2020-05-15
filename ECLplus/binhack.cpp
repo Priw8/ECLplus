@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "ECLplus.h"
 #include "binhack.h"
+#include "priority.h"
+
+static void ApplyPriorityBinhacks();
 
 struct CODE_WRITER {
     UCHAR* addr;
@@ -59,6 +62,9 @@ struct CODE_WRITER {
         this->pending.resize(this->pending.size() + size, 0x90);
         this->addr += size;
         return *this;
+    }
+    CODE_WRITER& WriteNopTill(LPCVOID ptr) {
+        return this->WriteNop((CONST UCHAR*)ptr - this->addr);
     }
 };
 
@@ -177,8 +183,98 @@ void InitBinhacks() {
         binhack.Commit();
     }
 
+    {
+        // Initialize extra enemy fields
+        CODE_WRITER binhack = { (LPVOID)0x41e257 };
+
+        CONST CHAR original[] = { '\x89', '\x86', '\x64', '\x57', '\x00', '\x00' };
+
+        binhack.Expect(original);
+
+        binhack.Write({ '\xE9' }); // jmp CAVE
+        binhack.WriteRel(cave.addr);
+        binhack.WriteNopTill((LPVOID)0x41e25d);
+
+        cave.Write(original);            // mov   dword [esi+0x5764], eax
+        cave.Write({ '\xc7', '\x86' });  // mov   dword [esi+targetRunGroup], DEFAULT_PRIORITY
+        cave.WriteDword(offsetof(ENEMYFULL, enm) + GetExFieldOffset(targetEffPriority));
+        cave.WriteDword(EFFECTIVE_PRIORITY_DEFAULT);
+        // (for any other fields we keep the zeros from an earlier memset)
+        cave.Write({ '\xE9' });          // jmp  0x41e25d
+        cave.WriteRel((LPVOID)0x41e25d);
+        cave.Write({ '\xCC' });          // (unreachable)
+        cave.Commit();
+        binhack.Commit();
+    }
+
+    {
+        // Remove enemy from rungroup on deletion in case it is destroyed by something
+        // that runs before it does.
+        CODE_WRITER binhack = { (LPVOID)0x41db53 };
+
+        CONST CHAR original[] = { '\x8b', '\x96', '\xfc', '\x14', '\x00', '\x00' };
+
+        binhack.Expect(original);
+
+        binhack.Write({ '\xE9' }); // jmp CAVE
+        binhack.WriteRel(cave.addr);
+        binhack.WriteNopTill((LPVOID)0x41db59);
+
+        cave.Write({ '\x51' }); // push ecx
+        cave.Write({ '\x52' }); // push edx
+        cave.Write({ '\x56' }); // push esi
+        cave.Write({ '\xE8' }); // call RemoveEnemyFromRunGroup
+        cave.WriteRel(RemoveEnemyFromRunGroup);
+        cave.Write({ '\x5a' }); // pop  edx
+        cave.Write({ '\x59' }); // pop  ecx
+        cave.Write(original);   // mov  edx, dword [esi+enemy.node.prev]
+        cave.Write({ '\xE9' }); // jmp
+        cave.WriteRel((LPVOID)0x41db59);
+        cave.Write({ '\xCC' }); // (unreachable)
+        cave.Commit();
+        binhack.Commit();
+    }
+
+    {
+        // EnemyManager::on_tick runs the default rungroup
+        CODE_WRITER binhack = { (LPVOID)0x41e8bc };
+
+        // we've got 97 bytes of space here, no need for a codecave
+        binhack.Write({ '\xE8' });  // call  RunEnemiesForEnemyManager
+        binhack.WriteRel(RunEnemiesForEnemyManager);
+        binhack.Write({ '\xE9' });  // jmp AFTER_LOOP
+        binhack.WriteRel((LPVOID)0x41e91c);
+        binhack.WriteNopTill((LPVOID)0x41e91c);
+        binhack.Commit();
+    }
+
+    {
+        // DEBUG DEBUG XXX
+        CODE_WRITER binhack = { (LPVOID)0x42070c };
+
+        CONST CHAR original[] = { '\xf3', '\x0f', '\x10', '\x93', '\xf0', '\x14', '\x00', '\x00' };
+
+        binhack.Expect(original);
+
+        binhack.Write({ '\xE9' }); // jmp CAVE
+        binhack.WriteRel(cave.addr);
+        binhack.WriteNopTill((LPVOID)0x420714);
+
+        cave.Write({ '\x51' }); // push ecx
+        cave.Write({ '\xE8' }); // call DebugStuffStuff
+        cave.WriteRel(DebugStuffStuff);
+        cave.Write(original);
+        cave.Write({ '\xE9' }); // jmp
+        cave.WriteRel((LPVOID)0x420714);
+        cave.Write({ '\xCC' }); // (unreachable)
+        cave.Commit();
+        binhack.Commit();
+    }
+
     // Player damage multiplier nop
     CODE_WRITER { (LPVOID)0x0041E94F }.WriteNop(10).Commit();
+
+    ApplyPriorityBinhacks();
 
     // (note: not giving this write permission crashes for some reason...?)
     DWORD old;
@@ -188,4 +284,74 @@ void InitBinhacks() {
     VirtualProtect(FUNC_POINTERS_BEGIN, sizeof(funcs), PAGE_EXECUTE_READWRITE, &old);
     *FUNC_POINTERS_BEGIN = funcs;
     VirtualProtect(FUNC_POINTERS_BEGIN, sizeof(funcs), old, &old);
+}
+
+static void ApplyPriorityBinhacks() {
+    struct PRIORITY_BINHACK {
+        DWORD addr;
+        DWORD oldPriority;
+    };
+
+    // !!!!!!!!!!!!!!!!!!
+    // TODO: Fix priority of functions already registered.
+    // Should do both that and this whlie holding the CRITICAL_SECTION for UpdateFuncManager.
+    // !!!!!!!!!!!!!!!!!!
+
+    // convert all 44 existing UpdateFunc priorities to use
+    PRIORITY_BINHACK binhacks[] = {
+        { 0x407dae, 0x05 }, // Ascii
+        { 0x409c21, 0x12 }, // Stage
+        { 0x40a7b3, 0x14 }, // Screen effect from Stage
+        { 0x40e4ef, 0x1f }, // Tokens
+        { 0x411686, 0x19 }, // ShotType
+        { 0x411ecd, 0x14 }, // Marisa bomb screen shake
+        { 0x4131a6, 0x14 }, // Reimu bomb screen effects 1
+        { 0x4138c5, 0x14 }, // Reimu bomb screen effects 2
+        { 0x413b7e, 0x14 }, // Reimu bomb screen effects 3
+        { 0x413e58, 0x14 }, // Youmu bomb screen shake
+        { 0x4148a8, 0x1d }, // Bullets
+        { 0x41befc, 0x25 }, // Ending????
+        { 0x41d0b8, 0x14 }, // Some screen effect (in Ending????)
+        { 0x41d175, 0x14 }, // Some screen effect (in Ending????)
+        { 0x41e61f, 0x1b }, // Enemies
+        { 0x42b53f, 0x22 }, // GUI/HUD
+        { 0x4305ac, 0x10 }, // Game thread (Cutoff for pause menu)
+        { 0x43074a, 0x1c }, // Lasers
+        { 0x430840, 0x0b }, // Pause & Game over menu
+        { 0x430ae2, 0x20 }, // Enemy Spellcard
+        { 0x4313e6, 0x14 }, // Screen effect from game thread
+        { 0x431a9b, 0x14 }, // Screen effect from... who cares?
+        { 0x43290e, 0x0c }, // Help manual
+        { 0x43323c, 0x1e }, // Items
+        { 0x440684, 0x21 }, // Global2020
+        { 0x440b30, 0x04 }, // Global640
+        { 0x441199, 0x02 }, // Global38
+        { 0x441758, 0x01 }, // IO
+        { 0x4464fa, 0x17 }, // Player
+        { 0x44de45, 0x11 }, // Game thread again (Game input)
+        { 0x44deba, 0x24 }, // Game thread again (???)
+        { 0x44e05f, 0x11 }, // Game thread again (Game input)
+        { 0x44e07d, 0x24 }, // Game thread again (???)
+        { 0x45045d, 0x15 }, // Kanji number popups
+        { 0x4510e4, 0x07 }, // Main menu
+        { 0x45da0d, 0x0e }, // Trophies
+        { 0x464967, 0x14 }, // More screen effects
+        { 0x464996, 0x14 }, // ...
+        { 0x4649d0, 0x14 }, // ...
+        { 0x4649f9, 0x14 }, // ...
+        { 0x464a1b, 0x14 }, // ...
+        { 0x464a3b, 0x14 }, // ...
+        { 0x471d5d, 0x23 }, // World ANMs
+        { 0x471dc5, 0x0a }, // UI ANMs
+    };
+    SIZE_T n = sizeof(binhacks) / sizeof(PRIORITY_BINHACK);
+    for (int i = 0; i < n; i++) {
+        CODE_WRITER binhack = { (LPVOID)binhacks[i].addr };
+        DWORD oldPriority = binhacks[i].oldPriority;
+        DWORD newPriority = RUNGROUP { oldPriority, REL_DURING }.EffectivePriority();
+
+        binhack.Expect({ '\x6a', (CHAR)oldPriority });
+        binhack.Write({ '\x6a', (CHAR)newPriority });
+        binhack.Commit();
+    }
 }

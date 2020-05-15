@@ -23,6 +23,7 @@
 #include "ins2200.h"
 #include "intvar.h"
 #include "binhack.h"
+#include "priority.h"
 
 /* Executes an extra ECL instruction, called by the modified game. */
 VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
@@ -148,12 +149,20 @@ VOID InitConsole() {
 
 VOID __stdcall MainLoop() {
     /* Called every frame. */
+    /* Better to do priorities here rather than in init to ensure that the update func registry exists. */
+
+    static DWORD hasAlreadyRun;
+    if (!hasAlreadyRun) {
+        InitPriorities();
+        hasAlreadyRun = 1;
+    }
 }
 
 VOID init() {
 #ifdef DEV
     InitConsole();
 #endif
+    //InitPriorities();
     InitBinhacks();
 }
 

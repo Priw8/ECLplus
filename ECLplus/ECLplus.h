@@ -119,10 +119,14 @@ typedef struct ENEMY {
 } ENEMY;
 #pragma pack(pop)
 
+struct ENEMYFULL;
+
 // Assign types and names to the extra fields we skimmed off of setNext.
-#define targetRunGroup(mac, enm, value) mac(enm, value, DWORD, 0, extraField1)
-#define nextInRunGroup(mac, enm, value) mac(enm, value, ENEMYFULL*, 0, extraField2)
-#define pendingDmg(mac, enm, value) mac(enm, value, DWORD, 1, extraField1)
+static_assert(sizeof(std::list<ENEMYFULL*>::iterator) == 4, "expected std::list::iterator to be one DWORD");
+#define pendingDmg(mac, enm, value) mac(enm, value, DWORD, 0, extraField1)
+#define iterInRunGroup(mac, enm, value) mac(enm, value, std::list<ENEMYFULL*>::iterator, 0, extraField2)
+#define currentEffPriority(mac, enm, value) mac(enm, value, DWORD, 1, extraField1)
+#define targetEffPriority(mac, enm, value) mac(enm, value, DWORD, 1, extraField2)
 
 // Use these macros to work with them.
 // E.g.  GetExField(enm, pendingDmg)  or  SetExField(enm, targetRunGroup, 0x14)
@@ -131,15 +135,15 @@ typedef struct ENEMY {
 #define GetExField(enm, fieldMac) (fieldMac(GetExField_impl, (enm), DUMMY))
 #define SetExField(enm, fieldMac, value) (fieldMac(SetExField_impl, (enm), (value)))
 
-#define GetExFieldOffset_impl(enm, value, T, index, field) (offsetof(ENEMY, setNext) + sizeof(ENEMY_SETNEXT) * index + offsetof(ENEMY_SETNEXT, field))
-#define GetExFieldAddr_impl(enm, value, T, index, field) ((T*)&(enm)->setNext[index].field)
-#define GetExField_impl(enm, value, T, index, field) (*GetExFieldAddr_impl(enm, T, index, field))
-#define SetExField_impl(enm, value, T, index, field) (*GetExFieldAddr_impl(enm, T, index, field) = value)
+#define GetExFieldOffset_impl(enm, dummy, T, index, field) (offsetof(ENEMY, setNext) + sizeof(ENEMY_SETNEXT) * index + offsetof(ENEMY_SETNEXT, field))
+#define GetExFieldAddr_impl(enm, dummy, T, index, field) ((T*)&(enm)->setNext[index].field)
+#define GetExField_impl(enm, dummy, T, index, field) (*GetExFieldAddr_impl(enm, DUMMY, T, index, field))
+#define SetExField_impl(enm, value, T, index, field) (*GetExFieldAddr_impl(enm, DUMMY, T, index, field) = value)
 
 #pragma pack(push, 1)
 typedef struct ENEMYVTABLE {
     void* pad[5];
-    void (__thiscall* Destroy)(DWORD);
+    void (__thiscall* Destroy)(ENEMYFULL*, DWORD);
 } ENEMYVTABLE;
 #pragma pack(pop)
 
@@ -184,6 +188,13 @@ typedef struct SPELLCARD {
 #pragma pack(pop, 1)
 #define SPELL_FLAG_CAPTURE 0x02
 
+#pragma pack(push, 1)
+typedef struct GAMETHREAD {
+    CHAR pad1[0x8c];
+    DWORD flags;
+} GAMETHREAD;
+#pragma pack(pop, 1)
+
 typedef double DOUBLE;
 
 #define SetDwordField(ptr,off,val) (*((DWORD*)(ptr + off)) = val)
@@ -195,6 +206,7 @@ typedef double DOUBLE;
 #define GameEnmMgr ((ENEMYMGR*)Deref(0x004B76A0))
 #define GameItemMgr ((ITEMMGR*)Deref(0x004B76B8))
 #define GameSpell ((SPELLCARD*)Deref(0x004B7690))
+#define GameThread ((GAMETHREAD*)Deref(0x004B76B0))
 
 #define GameGetIntArg 0x00428CC0
 #define GameGetFloatArg 0x00428CF0
@@ -208,6 +220,7 @@ typedef double DOUBLE;
 
 #define Gamemode *(DWORD*)(0x004B61D0)
 #define GamemodeNext *(DWORD*)(0x004B61D4)
+#define TimeInStage *(DWORD*)(0x004B59E8)
 
 // #define GetVm(x) (DWORD*)(*((DWORD*)(*(x+0x000044D8))+0x0C))
 
@@ -260,8 +273,26 @@ inline VOID EclPrint(CONST CHAR* str) {
     DWORD wr;
     WriteConsoleA(handle, str, strlen(str), &wr, NULL);
 }
+
+inline VOID EclPrintf(CONST CHAR* format, ...) {
+    va_list args1;
+    va_list args2;
+    va_start(args1, format);
+    va_copy(args2, args1);
+
+    SIZE_T size = 1 + vsnprintf(NULL, 0, format, args1);
+    char *buf = new char[size];
+
+    vsnprintf(buf, size, format, args2);
+    EclPrint(buf);
+
+    delete [] buf;
+    va_end(args1);
+    va_end(args2);
+}
 #else
 #define EclPrint(x)
+#define EclPrintF(x)
 #endif
 
 #define GamePrintRender 0x004082B0
@@ -321,4 +352,6 @@ VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins);
 #define FLAG_ETCLEAR_DIE 2048
 #define FLAG_RECT_HITBOX 4096
 
-#define FLAG_BOMBSHIELD 268435456
+#define FLAG_RAN_EARLY  0x40000
+#define FLAG_DELETEME   0x2000000
+#define FLAG_BOMBSHIELD 0x10000000

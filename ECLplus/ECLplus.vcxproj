@@ -311,6 +311,7 @@
     <ClInclude Include="intvar.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ECLplus.h" />
+    <ClInclude Include="priority.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="binhack.cpp" />
@@ -330,6 +331,7 @@
     </ClCompile>
     <ClCompile Include="ins2000.cpp" />
     <ClCompile Include="ECLplus.cpp" />
+    <ClCompile Include="priority.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
