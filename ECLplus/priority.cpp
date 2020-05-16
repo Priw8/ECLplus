@@ -45,9 +45,55 @@ struct PRIORITYMGR {
 
 static PRIORITYMGR priorityMgr;
 
-#define RegisterOnTickFunction ((void(__stdcall*)(UPDATE_FUNC*, DWORD effectivePriority)) 0x401140)
-#define RegisterOnDrawFunction ((void(__stdcall*)(UPDATE_FUNC*, DWORD effectivePriority)) 0x4011f0)
+#define RegisterOnTickFunction ((VOID(__stdcall*)(UPDATE_FUNC*, DWORD effectivePriority)) 0x401140)
+#define RegisterOnDrawFunction ((VOID(__stdcall*)(UPDATE_FUNC*, DWORD effectivePriority)) 0x4011f0)
 #define OnTickEnemyFull ((INT(__thiscall*)(ENEMYFULL*)) 0x00420700)
+// the third stack argument to this was originally optimized out; we stick a starting priority in there
+#define EnemyMgrCreateEnemy ((ENEMYFULL*(__thiscall*)(ENEMYMGR*, CHAR*, VOID*, DWORD effectivePriority)) 0x41e140)
+
+VOID __stdcall InitEnemyExFields(ENEMYFULL* full, DWORD effPriority) {
+	if (!effPriority) {
+		EclMsg("Enemy created with default effective priority 0!");
+	}
+	SetExField(&full->enm, defaultEffPriority, effPriority);
+	// (for any other fields we keep the zeros from an earlier memset)
+}
+
+// Get an enemy's current effective priority; i.e. the effective priority of the enemy list that the enemy
+// would run from on the next tick, assuming that it encounters no instruction to change priority before
+// the end of this tick.
+DWORD GetEnemyEffectivePriority(ENEMY* enemy) {
+	// If this is the enemy's first tick, target might not yet be set.
+	DWORD target = GetExField(enemy, targetEffPriority);
+	DWORD def = GetExField(enemy, defaultEffPriority);
+	return target ? target : def;
+}
+
+ENEMYFULL* __stdcall PatchedCreateChildEnemy(ENEMY* parent, CHAR* subname, void* instr, DWORD unusedArg3) {
+	return EnemyMgrCreateEnemy(GameEnmMgr, subname, instr, GetEnemyEffectivePriority(parent));
+}
+
+ENEMYFULL* __stdcall PatchedCreateNonChildEnemy(CHAR* subname, void* instr, DWORD unusedArg3) {
+	return EnemyMgrCreateEnemy(GameEnmMgr, subname, instr, EFFECTIVE_PRIORITY_DEFAULT);
+}
+
+VOID __stdcall AfterNewEnemyRunsFirstTick(ENEMYFULL* full) {
+	if (GetExField(&full->enm, targetEffPriority)) {
+		// The enemy explicitly set its priority on the first frame. Guarantee that it runs on the next frame.
+		full->enm.flags &= ~FLAG_RAN_EARLY;
+	}
+	else {
+		// No priority was explicitly set; simulate all of the vanilla game's run order bugs.
+		//
+		// Insert ourselves immediately into the rungroup list, and leave the EARLY_RUN flag on so that it gets
+		// skipped when seen.
+		SetExField(&full->enm, targetEffPriority, GetExField(&full->enm, defaultEffPriority));
+		DWORD effectivePriority = GetExField(&full->enm, targetEffPriority);
+		auto& list = priorityMgr.enemyLists[effectivePriority];
+		list.insert(list.end(), full);
+	}
+	SetExField(&full->enm, defaultEffPriority, 0); // nothing should look at this field anymore
+}
 
 static INT RunEnemiesInRunGroup(RUNGROUP *group) {
 	// TODO: Provide filters on GameThread flags to simulate how some other on_ticks work.
@@ -82,7 +128,13 @@ static INT __fastcall RunEnemiesInRunGroup(LPVOID group) {
 	return RunEnemiesInRunGroup((RUNGROUP*)group);
 }
 
+VOID DebugEnemyCounts();
+
 static INT RebuildPriorities(PRIORITYMGR *mgr) {
+	if (GameEnmMgr && GameEnmMgr->head) {
+		DebugEnemyCounts();
+	}
+
 	if (!GameEnmMgr) {
 		return 1;
 	}
@@ -91,11 +143,12 @@ static INT RebuildPriorities(PRIORITYMGR *mgr) {
 	}
 	for (ENEMYLISTNODE* node = GameEnmMgr->head; node; node = node->next) {
 		DWORD effectivePriority = GetExField(&node->obj->enm, targetEffPriority);
-		
+
 		auto& list = mgr->enemyLists[effectivePriority];
-		auto newIter = list.insert(list.end(), node->obj);
-		SetExField(&node->obj->enm, iterInRunGroup, newIter);
-		SetExField(&node->obj->enm, currentEffPriority, effectivePriority);
+		list.insert(list.end(), node->obj);
+	}
+	if (GameEnmMgr && GameEnmMgr->head) {
+		DebugEnemyCounts();
 	}
 	return 1;
 }
@@ -118,9 +171,6 @@ VOID InitPriorities() {
 
 		RegisterOnTickFunction(funcBefore, priorityMgr.calleesBefore[priority].EffectivePriority());
 		RegisterOnTickFunction(funcAfter, priorityMgr.calleesAfter[priority].EffectivePriority());
-		//EclPrintf("%d < %d\n", priority, priorityMgr.calleesBefore.size());
-		//EclPrintf("%#x BF %d\n", priority, priorityMgr.calleesBefore[priority].EffectivePriority());
-		//EclPrintf("%#x AF %d\n", priority, priorityMgr.calleesAfter[priority].EffectivePriority());
 
 		// priorityMgr will be around forever so we can just leak the update funcs.
 	}
@@ -135,22 +185,43 @@ VOID __stdcall RunEnemiesForEnemyManager() {
 	RunEnemiesInRunGroup(&priorityMgr.calleeForEnemyManager);
 }
 
-VOID __stdcall RemoveEnemyFromRunGroup(ENEMYFULL* full) {
-	DWORD effPriority = GetExField(&full->enm, currentEffPriority);
-	EclPrintf("Priority %d\n", effPriority);
-	if (effPriority) {
-		auto iter = GetExField(&full->enm, iterInRunGroup);
-		auto &list = priorityMgr.enemyLists[effPriority];
-		EclPrintf("R -> %d\n", list.size());
-		list.erase(iter);
+VOID DebugEnemyCounts() {
+	auto RelChar = [](PRIORITY_REL rel) -> CHAR {
+		switch (rel) {
+		case REL_BEFORE: return '-';
+		case REL_DURING: return '=';
+		case REL_AFTER: return '+';
+		default: return '?';
+		}
+	};
 
-		iter = {};
-		SetExField(&full->enm, iterInRunGroup, iter);
-		SetExField(&full->enm, currentEffPriority, 0);
+	if (!GameEnmMgr) {
+		return;
 	}
+
+	SIZE_T enemyCount = 0;
+	for (auto node = GameEnmMgr->head; node; node = node->next) {
+		enemyCount += 1;
+	}
+
+	EclPrintf(" TIME ALL");
+	for (SIZE_T i = 0; i < priorityMgr.enemyLists.size(); i++) {
+		if (!priorityMgr.enemyLists[i].empty()) {
+			auto group = RUNGROUP::FromEffectivePriority(i);
+			EclPrintf(" %02x%c", group.priority, RelChar(group.rel));
+		}
+	}
+	EclPrintf("\n");
+
+	EclPrintf("%5d %3d", TimeInStage, enemyCount);
+	for (auto &list: priorityMgr.enemyLists) {
+		if (!list.empty()) {
+			EclPrintf(" %3d", list.size());
+		}
+	}
+	EclPrintf("\n");
 }
 
 VOID __stdcall DebugStuffStuff(ENEMYFULL* full) {
 	EclPrintf("%d %d run %8x%8x\n", TimeInStage, *(DWORD*)((CHAR*)full + 0x1498), *(DWORD*)((CHAR*)full + 0x528c), *(DWORD*)((CHAR*)full + 0x5290));
-
 }

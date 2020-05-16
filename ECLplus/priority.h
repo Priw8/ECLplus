@@ -32,7 +32,7 @@
 #define NUM_PRIORITIES (PRIORITY_MAX - PRIORITY_MIN + 1)
 
 // "Effective priorities" are the true priorities we use interally.
-#define EFFECTIVE_PRIORITY_DEFAULT (RUNGROUP { PRIORITY_ENEMY, REL_AFTER }.EffectivePriority())
+#define EFFECTIVE_PRIORITY_DEFAULT (RUNGROUP { PRIORITY_ENEMY, REL_DURING }.EffectivePriority())
 #define EFFECTIVE_PRIORITY_MAINTHREAD (RUNGROUP::OfGameThread().EffectivePriority())
 // Min and max values accessible by ECL
 #define EFFECTIVE_PRIORITY_MAX (RUNGROUP { PRIORITY_MAX, REL_AFTER }.EffectivePriority())
@@ -64,6 +64,10 @@ struct RUNGROUP {
 
 	constexpr BOOL IsWorld() const {
 		return !this->IsUi();
+	}
+
+	constexpr static RUNGROUP FromEffectivePriority(DWORD eff) {
+		return { (eff + 1) / 3, (PRIORITY_REL)((INT)(eff + 1) % 3 - 1) };
 	}
 };
 #pragma pack(pop)
@@ -116,5 +120,8 @@ struct UPDATE_FUNC_REGISTRY {
 
 VOID InitPriorities();
 VOID __stdcall RunEnemiesForEnemyManager();
-VOID __stdcall RemoveEnemyFromRunGroup(ENEMYFULL* full);
 VOID __stdcall DebugStuffStuff(ENEMYFULL* full);
+ENEMYFULL* __stdcall PatchedCreateChildEnemy(ENEMY* parent, CHAR* subname, void* instr, DWORD unusedArg3);
+ENEMYFULL* __stdcall PatchedCreateNonChildEnemy(CHAR* subname, void* instr, DWORD unusedArg3);
+VOID __stdcall AfterNewEnemyRunsFirstTick(ENEMYFULL*);
+VOID __stdcall InitEnemyExFields(ENEMYFULL* full, DWORD effPriority);

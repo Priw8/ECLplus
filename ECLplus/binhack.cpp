@@ -195,42 +195,14 @@ void InitBinhacks() {
         binhack.WriteRel(cave.addr);
         binhack.WriteNopTill((LPVOID)0x41e25d);
 
-        cave.Write(original);            // mov   dword [esi+0x5764], eax
-        cave.Write({ '\xc7', '\x86' });  // mov   dword [esi+targetRunGroup], DEFAULT_PRIORITY
-        cave.WriteDword(offsetof(ENEMYFULL, enm) + GetExFieldOffset(targetEffPriority));
-        cave.WriteDword(EFFECTIVE_PRIORITY_DEFAULT);
-        // (for any other fields we keep the zeros from an earlier memset)
+        cave.Write(original);                   // mov   dword [esi+0x5764], eax
+        cave.Write({ '\xff', '\x75', '\x10' }); // push  dword [ebp + 0x10]
+        cave.Write({ '\x56' });                 // push  esi
+        cave.Write({ '\xE8' });
+        cave.WriteRel(InitEnemyExFields);
         cave.Write({ '\xE9' });          // jmp  0x41e25d
         cave.WriteRel((LPVOID)0x41e25d);
         cave.Write({ '\xCC' });          // (unreachable)
-        cave.Commit();
-        binhack.Commit();
-    }
-
-    {
-        // Remove enemy from rungroup on deletion in case it is destroyed by something
-        // that runs before it does.
-        CODE_WRITER binhack = { (LPVOID)0x41db53 };
-
-        CONST CHAR original[] = { '\x8b', '\x96', '\xfc', '\x14', '\x00', '\x00' };
-
-        binhack.Expect(original);
-
-        binhack.Write({ '\xE9' }); // jmp CAVE
-        binhack.WriteRel(cave.addr);
-        binhack.WriteNopTill((LPVOID)0x41db59);
-
-        cave.Write({ '\x51' }); // push ecx
-        cave.Write({ '\x52' }); // push edx
-        cave.Write({ '\x56' }); // push esi
-        cave.Write({ '\xE8' }); // call RemoveEnemyFromRunGroup
-        cave.WriteRel(RemoveEnemyFromRunGroup);
-        cave.Write({ '\x5a' }); // pop  edx
-        cave.Write({ '\x59' }); // pop  ecx
-        cave.Write(original);   // mov  edx, dword [esi+enemy.node.prev]
-        cave.Write({ '\xE9' }); // jmp
-        cave.WriteRel((LPVOID)0x41db59);
-        cave.Write({ '\xCC' }); // (unreachable)
         cave.Commit();
         binhack.Commit();
     }
@@ -245,6 +217,29 @@ void InitBinhacks() {
         binhack.Write({ '\xE9' });  // jmp AFTER_LOOP
         binhack.WriteRel((LPVOID)0x41e91c);
         binhack.WriteNopTill((LPVOID)0x41e91c);
+        binhack.Commit();
+    }
+
+    {
+        // After an enemy runs its first tick, set its default priority.
+        CODE_WRITER binhack = { (LPVOID)0x41e31b };
+
+        CONST CHAR original[] = { '\x83', '\xbf', '\x80', '\x01', '\x00', '\x00', '\x00' };
+
+        binhack.Expect(original);
+
+        binhack.Write({ '\xE9' }); // jmp CAVE
+        binhack.WriteRel(cave.addr);
+        binhack.WriteNopTill((LPVOID)0x41e322);
+
+        cave.Write({ '\x56' });          // push esi
+        cave.Write({ '\xE8' });          // call
+        cave.WriteRel(AfterNewEnemyRunsFirstTick);
+        cave.Write(original);            // cmp  dword [edi + 0x180], 0x0
+        cave.Write({ '\xE9' });          // jmp  AFTER
+        cave.WriteRel((LPVOID)0x41e322);
+        cave.Write({ '\xCC' });          // (unreachable)
+        cave.Commit();
         binhack.Commit();
     }
 
@@ -269,6 +264,34 @@ void InitBinhacks() {
         cave.Write({ '\xCC' }); // (unreachable)
         cave.Commit();
         binhack.Commit();
+    }
+
+    {
+        // callsite of 0x41480d that creates a child
+        CODE_WRITER binhack = { (LPVOID)0x426d79 };
+
+        binhack.Write({ '\xE9' }); // jmp CAVE
+        binhack.WriteRel(cave.addr);
+        binhack.WriteNopTill((LPVOID)0x426d7e);
+
+        cave.Write({ '\x56' }); // push esi
+        cave.Write({ '\xE8' }); // call
+        cave.WriteRel(PatchedCreateChildEnemy);
+        cave.Write({ '\xE9' }); // jmp
+        cave.WriteRel((LPVOID)0x426d7e);
+        cave.Write({ '\xCC' }); // (unreachable)
+        cave.Commit();
+        binhack.Commit();
+
+        // callsites that aren't creating children
+        std::array<DWORD, 3> addrs = { 0x417ad4, 0x431c58, 0x431e83 };
+        for (auto it = addrs.begin(); it != addrs.end(); it++) {
+            binhack = { (LPVOID)*it };
+
+            binhack.Write({ '\xE8' });
+            binhack.WriteRel(PatchedCreateNonChildEnemy);
+            binhack.Commit();
+        }
     }
 
     // Player damage multiplier nop

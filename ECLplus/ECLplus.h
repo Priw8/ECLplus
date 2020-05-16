@@ -122,11 +122,9 @@ typedef struct ENEMY {
 struct ENEMYFULL;
 
 // Assign types and names to the extra fields we skimmed off of setNext.
-static_assert(sizeof(std::list<ENEMYFULL*>::iterator) == 4, "expected std::list::iterator to be one DWORD");
 #define pendingDmg(mac, enm, value) mac(enm, value, DWORD, 0, extraField1)
-#define iterInRunGroup(mac, enm, value) mac(enm, value, std::list<ENEMYFULL*>::iterator, 0, extraField2)
-#define currentEffPriority(mac, enm, value) mac(enm, value, DWORD, 1, extraField1)
-#define targetEffPriority(mac, enm, value) mac(enm, value, DWORD, 1, extraField2)
+#define defaultEffPriority(mac, enm, value) mac(enm, value, DWORD, 0, extraField2) // parent's priority at creation
+#define targetEffPriority(mac, enm, value) mac(enm, value, DWORD, 1, extraField1)
 
 // Use these macros to work with them.
 // E.g.  GetExField(enm, pendingDmg)  or  SetExField(enm, targetRunGroup, 0x14)
@@ -250,7 +248,7 @@ FLOAT GetFloatArgEx(ENEMY* enm, DWORD n, FLOAT val);
 const CHAR* GetStringArg(INSTR* ins, DWORD n);
 
 /* Returns a pointer to the int variable passed as the nth argument.
- * NOTE: only works for n=0 because of optimizations MSVC did on WBaWC 
+ * NOTE: only works for n=0 because of optimizations MSVC did on WBaWC
  * (game only ever calls this with n=0) */
 LONG* GetIntArgAddr(ENEMY* enm, DWORD n);
 
@@ -303,7 +301,7 @@ inline VOID EclPrintf(CONST CHAR* format, ...) {
 #define GamePrintRenderStructAnchorY 0x0001923c
 #define GamePrintRenderStructShadow 0x00019228
 
-/* Prints given string on the given coordinates within the game window. 
+/* Prints given string on the given coordinates within the game window.
  * 'data' contains the raw values that will be pushed to the stack as the
  * format data for the game's function (must be DWORD aligned length) */
 inline VOID EclPrintRender(FLOAT x, FLOAT y, CONST CHAR* format, DWORD len, CHAR* data) {
