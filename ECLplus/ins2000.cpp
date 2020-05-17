@@ -19,6 +19,7 @@
 #include "pch.h"
 #include "ins2000.h"
 #include "ECLplus.h"
+#include "priority.h"
 
 static DWORD EclArgList(CHAR* args, ENEMY* enm, INSTR* ins, PARAMD* D, DWORD i) {
     DWORD ind = 0;
@@ -56,7 +57,7 @@ static VOID EclPrintf(CHAR* buf, DWORD bufSize, INSTR* ins, ENEMY* enm) {
     CONST CHAR* str = GetStringArg(ins, 0);
     DWORD size = *(DWORD*)(&ins->data[0]); /* this includes padding (its purpose is keeping the rest of the params aligned) */
     PARAMD* D = (PARAMD*)&ins->data[size + 4]; /* +4 to include the size param */
-    
+
     CHAR args[16*8];
     EclArgList(args, enm, ins, D, 1);
 
@@ -173,6 +174,15 @@ BOOL ins_2000(ENEMY* enm, INSTR* ins) {
     case INS_SOUND_PANNED:
         PlaySoundPanned(GetIntArg(enm, 0), GetFloatArg(enm, 1));
         break;
+    case INS_SET_PRIORITY: {
+        RUNGROUP group = { (DWORD)GetIntArg(enm, 0), (PRIORITY_REL)GetIntArg(enm, 1) };
+        if (!group.IsValidForEnemies()) {
+            EclMsgf("Enemy attempted to set invalid priority(%d, %d)!", group.priority, group.rel);
+            return TRUE;
+        }
+        SetExField(enm, targetEffPriority, group.EffectivePriority());
+        break;
+    }
     default:
         return FALSE;
     }

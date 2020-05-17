@@ -269,7 +269,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
         case INS_MSG_RECEIVE:
         case INS_MSG_PEEK: {
             MESSAGE* msg = MsgReceive(GetIntArg(enm, 5), ins->id != INS_MSG_PEEK);
-            
+
             LONG* ptr = GetIntArgAddr(enm, 0);
             if (ptr != NULL) *ptr = msg == NULL ? 0 : 1;
             if (msg == NULL) break;
@@ -341,7 +341,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
             break;
         }
         case INS_ENM_DAMAGE_RADIUS: {
-            FLOAT x = GetFloatArg(enm, 1), 
+            FLOAT x = GetFloatArg(enm, 1),
                   y = GetFloatArg(enm, 2),
                   rad = GetFloatArg(enm, 3);
 
@@ -438,7 +438,7 @@ BOOL ins_2200(ENEMY* enm, INSTR* ins) {
                 LONG id = GetIntArg(enm, 1);
                 ENEMYLISTNODE* node = GameEnmMgr->head;
                 while(node != NULL && node->obj->enm.id != id) {
-                    node = node->next;   
+                    node = node->next;
                 }
                 *((ENEMYLISTNODE**)ptr) = node;
             }

@@ -19,6 +19,7 @@
 #include "pch.h"
 #include "intvar.h"
 #include "ins2100.h"
+#include "priority.h"
 
 /* Extra global integer variables */
 static DWORD GI[4] = {0, 0, 0, 0};
@@ -60,6 +61,10 @@ DWORD IntVarGetVal(ENEMY* enm, DWORD var) {
             return *INTVAR_ISDIALOG_LOC;
         case INTVAR_SPELLBONUS:
             return GameSpell ? GameSpell->bonus : 0;
+        case INTVAR_PRIORITY:
+            return RUNGROUP::FromEffectivePriority(GetEnemyEffectivePriority(enm)).priority;
+        case INTVAR_PRIORITY_REL:
+            return RUNGROUP::FromEffectivePriority(GetEnemyEffectivePriority(enm)).rel;
         default:
             return 0;
     }
@@ -104,6 +109,8 @@ DWORD* IntVarGetAddr(ENEMY* enm, DWORD var) {
         case INTVAR_HYPERTIMER:
         case INTVAR_ISDIALOG:
         case INTVAR_SPELLBONUS:
+        case INTVAR_PRIORITY:
+        case INTVAR_PRIORITY_REL:
             return &invalidAddr;
         default:
             return &invalidAddr;

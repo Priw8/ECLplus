@@ -30,9 +30,7 @@ struct CODE_WRITER {
     template<SIZE_T SIZE>
     BOOL Expect(CONST CHAR (&arr)[SIZE]) {
         if (memcmp(this->addr, arr, SIZE)) {
-            char buf[256];
-            snprintf(buf, 256, "ECLplus binhack warning: Expected bytes not found at %#08x.", (DWORD)this->addr);
-            EclMsg(buf);
+            EclMsgf("ECLplus binhack warning: Expected bytes not found at %#08x.", (DWORD)this->addr);
             return FALSE;
         }
         return TRUE;
@@ -267,6 +265,26 @@ void InitBinhacks() {
     }
 
     {
+        // Clear the enemy lists when they're all deleted.
+        CODE_WRITER binhack = { (LPVOID)0x41b534 };
+
+        CONST CHAR original[] = { '\x8b', '\x43', '\x08', '\x5f', '\x5e' };
+        binhack.Expect(original);
+
+        binhack.Write({ '\xE9' }); // jmp
+        binhack.WriteRel(cave.addr);
+
+        cave.Write({ '\xE8' }); // call
+        cave.WriteRel(ClearAllEnemyLists);
+        cave.Write(original);
+        cave.Write({ '\xE9' }); // jmp
+        cave.WriteRel((LPVOID)0x41b539);
+        cave.Write({ '\xCC' }); // (unreachable)
+        cave.Commit();
+        binhack.Commit();
+    }
+
+    {
         // callsite of 0x41480d that creates a child
         CODE_WRITER binhack = { (LPVOID)0x426d79 };
 
@@ -367,8 +385,9 @@ static void ApplyPriorityBinhacks() {
         { 0x471d5d, 0x23 }, // World ANMs
         { 0x471dc5, 0x0a }, // UI ANMs
     };
+
     SIZE_T n = sizeof(binhacks) / sizeof(PRIORITY_BINHACK);
-    for (int i = 0; i < n; i++) {
+    for (SIZE_T i = 0; i < n; i++) {
         CODE_WRITER binhack = { (LPVOID)binhacks[i].addr };
         DWORD oldPriority = binhacks[i].oldPriority;
         DWORD newPriority = RUNGROUP { oldPriority, REL_DURING }.EffectivePriority();

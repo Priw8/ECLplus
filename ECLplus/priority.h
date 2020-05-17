@@ -23,20 +23,27 @@
 // Prevent accidental usage of these windows macros, we don't need to use a printer >_>
 #undef MIN_PRIORITY
 #undef MAX_PRIORITY
-// Min and max priorities that ECL is allowed to use.
-#define PRIORITY_MIN 0x01
-#define PRIORITY_MAX 0x25
-// Priority of some notable things.
+#define PRIORITY_MIN 0x01 // min that we will allow for enemies
+#define PRIORITY_GAMETHREAD 0x10 // cutoff for UI
 #define PRIORITY_ENEMY 0x1b
-#define PRIORITY_GAMETHREAD 0x10
+#define PRIORITY_MAX 0x24 // max that we will allow for enemies
+#define PRIORITY_REPLAY_SPEEDUP 0x25 // cutoff for world
 #define NUM_PRIORITIES (PRIORITY_MAX - PRIORITY_MIN + 1)
 
 // "Effective priorities" are the true priorities we use interally.
 #define EFFECTIVE_PRIORITY_DEFAULT (RUNGROUP { PRIORITY_ENEMY, REL_DURING }.EffectivePriority())
-#define EFFECTIVE_PRIORITY_MAINTHREAD (RUNGROUP::OfGameThread().EffectivePriority())
-// Min and max values accessible by ECL
-#define EFFECTIVE_PRIORITY_MAX (RUNGROUP { PRIORITY_MAX, REL_AFTER }.EffectivePriority())
-#define EFFECTIVE_PRIORITY_MIN (RUNGROUP { PRIORITY_MIN, REL_BEFORE }.EffectivePriority())
+
+// Min and max values that enemies may have
+#define EFFECTIVE_PRIORITY_MAX EFFECTIVE_PRIORITY_MAX_WORLD
+#define EFFECTIVE_PRIORITY_MIN EFFECTIVE_PRIORITY_MIN_UI
+#define EFFECTIVE_PRIORITY_MAX_WORLD (RUNGROUP { PRIORITY_MAX, REL_AFTER }.EffectivePriority())
+#define EFFECTIVE_PRIORITY_MIN_WORLD (RUNGROUP { PRIORITY_GAMETHREAD, REL_AFTER }.EffectivePriority())
+#define EFFECTIVE_PRIORITY_MAX_UI (RUNGROUP { PRIORITY_GAMETHREAD, REL_BEFORE }.EffectivePriority())
+#define EFFECTIVE_PRIORITY_MIN_UI (RUNGROUP { PRIORITY_MIN, REL_BEFORE }.EffectivePriority())
+
+// Priorities of update funcs that rebuild priority lists.
+#define EFFECTIVE_PRIORITY_REBUILD_UI 1
+#define EFFECTIVE_PRIORITY_REBUILD_WORLD (RUNGROUP { PRIORITY_REPLAY_SPEEDUP, REL_BEFORE }.EffectivePriority())
 
 enum PRIORITY_REL : INT {
 	REL_BEFORE = -1,
@@ -69,12 +76,27 @@ struct RUNGROUP {
 	constexpr static RUNGROUP FromEffectivePriority(DWORD eff) {
 		return { (eff + 1) / 3, (PRIORITY_REL)((INT)(eff + 1) % 3 - 1) };
 	}
+
+	constexpr BOOL IsValidForEnemies() const {
+		if (!(-1 <= this->rel && this->rel <= 1)) {
+			return false;
+		}
+
+		DWORD eff = this->EffectivePriority();
+		BOOL isUi = EFFECTIVE_PRIORITY_MIN_UI <= eff && eff <= EFFECTIVE_PRIORITY_MAX_UI;
+		BOOL isWorld = EFFECTIVE_PRIORITY_MIN_WORLD <= eff && eff <= EFFECTIVE_PRIORITY_MAX_WORLD;
+		return isUi || isWorld;
+	}
 };
 #pragma pack(pop)
 
 // 0 is used to mean "no value" in some places
 static_assert(PRIORITY_MIN > 0, "ambiguous use of priority 0");
 static_assert(EFFECTIVE_PRIORITY_MIN > 0, "ambiguous use of priority 0");
+
+// In order for things to run once per frame, rebuild funcs should be before everything or after everything.
+static_assert(EFFECTIVE_PRIORITY_REBUILD_UI < EFFECTIVE_PRIORITY_MIN_UI, "ui rebuild priority is not at an extreme");
+static_assert(EFFECTIVE_PRIORITY_REBUILD_WORLD > EFFECTIVE_PRIORITY_MAX_WORLD, "world rebuild priority is not at an extreme");
 
 struct UPDATE_FUNC;
 
@@ -125,3 +147,5 @@ ENEMYFULL* __stdcall PatchedCreateChildEnemy(ENEMY* parent, CHAR* subname, void*
 ENEMYFULL* __stdcall PatchedCreateNonChildEnemy(CHAR* subname, void* instr, DWORD unusedArg3);
 VOID __stdcall AfterNewEnemyRunsFirstTick(ENEMYFULL*);
 VOID __stdcall InitEnemyExFields(ENEMYFULL* full, DWORD effPriority);
+DWORD GetEnemyEffectivePriority(ENEMY* enemy);
+VOID __stdcall ClearAllEnemyLists();

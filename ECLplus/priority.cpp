@@ -53,7 +53,7 @@ static PRIORITYMGR priorityMgr;
 
 VOID __stdcall InitEnemyExFields(ENEMYFULL* full, DWORD effPriority) {
 	if (!effPriority) {
-		EclMsg("Enemy created with default effective priority 0!");
+		EclMsg("Enemy created with default effective priority 0!  This is a bug in ECLplus!");
 	}
 	SetExField(&full->enm, defaultEffPriority, effPriority);
 	// (for any other fields we keep the zeros from an earlier memset)
@@ -130,7 +130,7 @@ static INT __fastcall RunEnemiesInRunGroup(LPVOID group) {
 
 VOID DebugEnemyCounts();
 
-static INT RebuildPriorities(PRIORITYMGR *mgr) {
+static INT RebuildPriorities(PRIORITYMGR *mgr, DWORD effPriorityFrom, DWORD effPriorityTo) {
 	if (GameEnmMgr && GameEnmMgr->head) {
 		DebugEnemyCounts();
 	}
@@ -138,22 +138,27 @@ static INT RebuildPriorities(PRIORITYMGR *mgr) {
 	if (!GameEnmMgr) {
 		return 1;
 	}
-	for (auto list = mgr->enemyLists.begin(); list != mgr->enemyLists.end(); ++list) {
-		list->clear();
+
+	for (DWORD i = effPriorityFrom; i <= effPriorityTo; ++i) {
+		mgr->enemyLists[i].clear();
 	}
 	for (ENEMYLISTNODE* node = GameEnmMgr->head; node; node = node->next) {
-		DWORD effectivePriority = GetExField(&node->obj->enm, targetEffPriority);
-
-		auto& list = mgr->enemyLists[effectivePriority];
-		list.insert(list.end(), node->obj);
+		DWORD effPriority = GetExField(&node->obj->enm, targetEffPriority);
+		if (effPriorityFrom <= effPriority && effPriority <= effPriorityTo) {
+			auto& list = mgr->enemyLists[effPriority];
+			list.insert(list.end(), node->obj);
+		}
 	}
 	if (GameEnmMgr && GameEnmMgr->head) {
 		DebugEnemyCounts();
 	}
 	return 1;
 }
-static INT __fastcall RebuildPriorities(LPVOID mgr) {
-	return RebuildPriorities((PRIORITYMGR*)mgr);
+static INT __fastcall RebuildPrioritiesUi(LPVOID mgr) {
+	return RebuildPriorities((PRIORITYMGR*)mgr, EFFECTIVE_PRIORITY_MIN_UI, EFFECTIVE_PRIORITY_MAX_UI);
+}
+static INT __fastcall RebuildPrioritiesWorld(LPVOID mgr) {
+	return RebuildPriorities((PRIORITYMGR*)mgr, EFFECTIVE_PRIORITY_MIN_WORLD, EFFECTIVE_PRIORITY_MAX_WORLD);
 }
 
 VOID InitPriorities() {
@@ -174,15 +179,27 @@ VOID InitPriorities() {
 
 		// priorityMgr will be around forever so we can just leak the update funcs.
 	}
-	// Rebuild enemy lists after all other update funcs have run
-	auto funcRebuild = new UPDATE_FUNC();
-	funcRebuild->callee = &priorityMgr;
-	funcRebuild->function = RebuildPriorities;
-	RegisterOnTickFunction(funcRebuild, PRIORITY_MAX + 1);
+	// Update funcs to rebuild enemy lists
+	auto funcRebuildUi = new UPDATE_FUNC();
+	funcRebuildUi->callee = &priorityMgr;
+	funcRebuildUi->function = RebuildPrioritiesUi;
+	RegisterOnTickFunction(funcRebuildUi, EFFECTIVE_PRIORITY_REBUILD_UI);
+
+	auto funcRebuildWorld = new UPDATE_FUNC();
+	funcRebuildWorld->callee = &priorityMgr;
+	funcRebuildWorld->function = RebuildPrioritiesWorld;
+	RegisterOnTickFunction(funcRebuildWorld, EFFECTIVE_PRIORITY_REBUILD_WORLD);
 }
 
 VOID __stdcall RunEnemiesForEnemyManager() {
 	RunEnemiesInRunGroup(&priorityMgr.calleeForEnemyManager);
+}
+
+VOID __stdcall ClearAllEnemyLists() {
+	auto& lists = priorityMgr.enemyLists;
+	for (auto it = lists.begin(); it != lists.end(); ++it) {
+		it->clear();
+	}
 }
 
 VOID DebugEnemyCounts() {

@@ -27,9 +27,6 @@
 
 /* Executes an extra ECL instruction, called by the modified game. */
 VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
-#ifdef DEV
-    CHAR buf[256];
-#endif
     BOOL success;
     if (ins->id >= 2000 && ins->id < 2100) {
         success = ins_2000(enm, ins);
@@ -41,12 +38,10 @@ VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
 #ifdef DEV
     else {
         success = TRUE;
-        snprintf(buf, 256, "instruction out of range: %d", ins->id);
-        EclMsg(buf);
+        EclMsgf("instruction out of range: %d", ins->id);
     }
     if (!success) {
-        snprintf(buf, 256, "bad instruction number: %d", ins->id);
-        EclMsg(buf);
+        EclMsgf("bad instruction number: %d", ins->id);
     }
 #endif
 }

@@ -260,6 +260,23 @@ inline VOID EclMsg(CONST CHAR* str) {
     MessageBoxA(NULL, str, "ECLplus", MB_OK);
 }
 
+inline VOID EclMsgf(CONST CHAR* format, ...) {
+    va_list args1;
+    va_list args2;
+    va_start(args1, format);
+    va_copy(args2, args1);
+
+    SIZE_T size = 1 + vsnprintf(NULL, 0, format, args1);
+    char* buf = new char[size];
+
+    vsnprintf(buf, size, format, args2);
+    EclMsg(buf);
+
+    delete[] buf;
+    va_end(args1);
+    va_end(args2);
+}
+
 /* Prints given string in the console. */
 #ifdef DEV
 inline VOID EclPrint(CONST CHAR* str) {
@@ -290,7 +307,7 @@ inline VOID EclPrintf(CONST CHAR* format, ...) {
 }
 #else
 #define EclPrint(x)
-#define EclPrintF(x)
+#define EclPrintf(x)
 #endif
 
 #define GamePrintRender 0x004082B0

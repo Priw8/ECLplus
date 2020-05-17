@@ -33,6 +33,7 @@
 #ins "2013"
 #ins "2014 S"
 #ins "2021 Sf"
+#ins "2022 SS"
 
 #ins "2100 ff"
 #ins "2101"
@@ -110,3 +111,35 @@ global ANCHOR_LEFT = 1;
 global ANCHOR_RIGHT = 2;
 global ANCHOR_TOP = 1;
 global ANCHOR_BOTTOM = 2;
+
+global PRIORITY_MASTER = 0x01; // Raw Keyboard input, gamemodes, and more
+// global PRIORITY_ = 0x02; // Global38
+// global PRIORITY_ = 0x04; // Global640
+global PRIORITY_ASCII = 0x05;
+global PRIORITY_MAIN_MENU = 0x07;
+global PRIORITY_ANM_UI = 0x0a;
+global PRIORITY_PAUSE = 0x0b;
+global PRIORITY_MANUAL = 0x0c;
+global PRIORITY_TROPHY = 0x0e;
+global PRIORITY_GAMETHREAD = 0x10; // Cutoff for things active during pause
+global PRIORITY_GAME_INPUT = 0x11; // Records or reads replay data
+global PRIORITY_STAGE = 0x12;
+global PRIORITY_SCREEN_FX = 0x14;
+global PRIORITY_NUMBER_POPUPS = 0x15;
+global PRIORITY_PLAYER = 0x17;
+global PRIORITY_BOMB = 0x19;
+global PRIORITY_ENEMY = 0x1b;
+global PRIORITY_LASER = 0x1c;
+global PRIORITY_BULLET = 0x1d;
+global PRIORITY_ITEM = 0x1e;
+global PRIORITY_GOAST = 0x1f;
+global PRIORITY_SPELLCARD = 0x20;
+// global PRIORITY_ = 0x21; // Global2020
+global PRIORITY_HUD = 0x22;
+global PRIORITY_ANM_WORLD = 0x23;
+global PRIORITY_REPLAY_SPEEDUP = 0x24;
+global PRIORITY_ENDING = 0x25;
+
+global REL_BEFORE = -1;
+global REL_DURING = 0;
+global REL_AFTER = 1;

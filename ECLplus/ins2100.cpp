@@ -38,7 +38,7 @@ BOOL ins_2100(ENEMY* enm, INSTR* ins) {
             __asm {
                 mov ecx, DWORD_PTR[0x004B76AC] // this ptr
                 push DWORD_PTR[0x004B5A44]
-                push DWORD_PTR[PlayerLivesPtr] 
+                push DWORD_PTR[PlayerLivesPtr]
                 mov eax, 0x0042FC60
                 call eax
             }
