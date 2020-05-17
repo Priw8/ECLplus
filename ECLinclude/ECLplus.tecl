@@ -121,7 +121,7 @@ global PRIORITY_ANM_UI = 0x0a;
 global PRIORITY_PAUSE = 0x0b;
 global PRIORITY_MANUAL = 0x0c;
 global PRIORITY_TROPHY = 0x0e;
-global PRIORITY_GAMETHREAD = 0x10; // Cutoff for things active during pause
+global PRIORITY_UI_CUTOFF = 0x10; // Cutoff for things active during pause
 global PRIORITY_GAME_INPUT = 0x11; // Records or reads replay data
 global PRIORITY_STAGE = 0x12;
 global PRIORITY_SCREEN_FX = 0x14;
@@ -137,8 +137,7 @@ global PRIORITY_SPELLCARD = 0x20;
 // global PRIORITY_ = 0x21; // Global2020
 global PRIORITY_HUD = 0x22;
 global PRIORITY_ANM_WORLD = 0x23;
-global PRIORITY_REPLAY_SPEEDUP = 0x24;
-global PRIORITY_ENDING = 0x25;
+// There's a few more but you're not allowed to use them in ECLplus...
 
 global REL_BEFORE = -1;
 global REL_DURING = 0;
