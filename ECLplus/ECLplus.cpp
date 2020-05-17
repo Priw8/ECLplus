@@ -157,7 +157,6 @@ VOID init() {
 #ifdef DEV
     InitConsole();
 #endif
-    //InitPriorities();
     InitBinhacks();
 }
 
