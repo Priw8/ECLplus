@@ -246,6 +246,7 @@ static LONG DamageEnemiesImpl(COLLISION_SHAPE *dmgShape, LONG dmg, LONG maxcnt, 
         enmArr[itr]->pendingDmg += ApplyBombShields(dmg, enmArr[itr], isBomb);
         ++cnt;
     }
+    return cnt;
 }
 
 BOOL ins_2200(ENEMY* enm, INSTR* ins) {
