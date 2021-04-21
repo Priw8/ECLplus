@@ -362,7 +362,7 @@ BOOL ins_2300(ENEMY* enm, INSTR* ins) {
             }
             else {
                 /* To prevent the ECL stack from getting completely hecked by having 1 less value than it should. */
-                EclStackPushInt(enm->full->eclCtx, ins, 0);
+                EclStackPushInt(enm->full->eclCtx, ins, DATAVALUE_INVALID);
             }
             break;
         }
@@ -508,7 +508,7 @@ BOOL ins_2300(ENEMY* enm, INSTR* ins) {
                 EclStackPushInt(enm->full->eclCtx, ins, (*strct->map)[field].type);
             }
             else {
-                EclStackPushInt(enm->full->eclCtx, ins, NULL);
+                EclStackPushInt(enm->full->eclCtx, ins, DATAVALUE_INVALID);
             }
             break;
         }

@@ -17,125 +17,108 @@
 */
 
 #eclmap "ECLplus.eclm"
-#ins "2000 m*D"
-#ins "2001 m*D"
-#ins "2002"
-#ins "2003 ffm*D"
-#ins "2004 S"
-#ins "2005 m"
-#ins "2006"
-#ins "2007 f"
-#ins "2008 S"
-#ins "2009 S"
-#ins "2010 S"
-#ins "2011 S"
-#ins "2012 SS"
-#ins "2013"
-#ins "2014 S"
-#ins "2021 Sf"
-#ins "2015 S"
-#ins_ret "2015 S"
-#ins "2016 f"
-#ins_ret "2016 S"
-#ins "2017 S"
-#ins_ret "2017 S"
-#ins "2018 S"
-#ins_ret "2018 f"
-#ins "2019 SS"
-#ins "2020 Sf"
 
-#ins "2100 ff"
-#ins "2101"
-#ins "2102"
-#ins "2103 S"
-#ins "2104 S"
-#ins "2105 S"
-#ins "2106 S"
-#ins "2107 S"
-#ins "2108 S"
-#ins "2109 S"
-#ins "2110 f"
-#ins "2111 f"
+insdef void msgf(string format, ...) = 2000;
+insdef void printf(string format, ...) = 2001;
+insdef void cls() = 2002;
+insdef void drawf(float xPos, float yPos, string format, ...) = 2003;
+insdef void drawColor(int color) = 2004;
+insdef void playMusic(string name) = 2005;
+insdef void exit() = 2006;
+insdef void itemSpeed(float speed) = 2007;
+insdef void spellSetCapture(int state) = 2008;
+insdef void spellSetBonus(int maxBonus) = 2009;
+insdef void spellSetBonusNow(int currBonus) = 2010;
+insdef void drawFont(int fontType) = 2011;
+insdef void drawAnchor(int anchorX, int anchorY) = 2012;
+insdef void drawReset() = 2013;
+insdef void drawShadow(int state) = 2014;
+insdef int addri(int intVar) = 2015;
+insdef int addrf(int floatVar) = 2016;
+insdef int derefi(int intVarAddr) = 2017;
+insdef float dereff(int floatVarAddr) = 2018;
+insdef void writei(int intVarAddr, int val) = 2019;
+insdef void writef(int floatVarAddr, float val) = 2020;
+insdef void playSoundPos(int id, float pos) = 2021;
 
-#ins "2200"
-#ins "2201 S"
-#ins "2202 ffffS"
-#ins "2203 SffffS"
-#ins "2204 SffffS"
-#ins "2205 SS"
+insdef void playerPos(float x, float y) = 2100;
+insdef void playerKill() = 2101;
+insdef void playerBomb() = 2102;
+insdef void playerSetLives(int amount) = 2103;
+insdef void playerSetBombs(int amount) = 2104;
+insdef void playerSetPower(int amount) = 2105;
+insdef void playerSetIframes(int duration) = 2106;
+insdef void playerAllowShot(int state) = 2107;
+insdef void playerAllowBomb(int state) = 2108;
+insdef void playerSetHyperTimer(int state) = 2109;
+insdef void playerSetDamageMult(float mult) = 2110;
+insdef void playerSetSpeedMult(float mult) = 2111;
 
-#ins "2210 Sfff"
-#ins "2211 SS*S"
-#ins "2212 SS*S"
-#ins "2213 SfffSS*S"
-#ins "2214 SffffSS*S"
-#ins "2215 SS"
-#ins "2216 SS"
-#ins "2217 SS"
-#ins "2218 SS"
-#ins "2219 SS"
-#ins "2220 SS"
-#ins "2221 SS"
-#ins "2222 ffS"
-#ins "2223 fS"
-#ins "2224 fS"
-#ins "2225 SfffffSS*S"
+insdef void msgResetAll() = 2200;
+insdef void msgReset(int channel) = 2201;
+insdef void msgSend(float a, float b, float c, float d, int channel) = 2202;
+insdef void msgReceive(int received, float a, float b, float c, float d, int channel) = 2203;
+insdef void msgPeek(int received, float a, float b, float c, float d, int channel) = 2204;
+insdef void msgCheck(int received, int channel) = 2205;
 
-#ins "2300 S"
-#ins_ret "2300 S"
-#ins "2301"
-#ins_ret "2301 S"
-#ins "2302 S"
-#ins_ret "2302 S"
-#ins "2303 S"
-#ins_ret "2303 S"
-#ins "2304 S"
-#ins "2305 S"
-#ins "2306 S"
-#ins "2307 SSS"
-#ins "2308 SSf"
-#ins "2309 SSS"
-#ins "2310 SS"
-#ins "2311 Sf"
-#ins "2312 SS"
-#ins "2313 SS"
-#ins "2314 Sf"
-#ins "2315 SS"
-#ins "2316 SSS"
-#ins "2317 SS"
-#ins "2318 SSS"
-#ins "2319 SSf"
-#ins "2320 SSS"
-#ins "2321 SS"
-#ins "2322 S"
-#ins_ret "2322 S"
-#ins "2323 SS"
-#ins_ret "2323 S"
-#ins "2324 S"
-#ins_ret "2324 S"
-#ins "2325 S"
-#ins_ret "2325 f"
-#ins "2326 S"
-#ins_ret "2326 S"
-#ins "2327 SS"
-#ins_ret "2327 S"
-#ins "2328 SS"
-#ins_ret "2328 f"
-#ins "2329 SS"
-#ins_ret "2329 S"
-#ins "2330 S"
-#ins_ret "2330 S"
-#ins "2331 SS"
-#ins_ret "2331 S"
-#ins "2332 SS"
-#ins_ret "2332 S"
-#ins "2333 SS"
-#ins_ret "2333 S"
-#ins "2334 SS"
-#ins_ret "2334 f"
-#ins "2335 SS"
-#ins_ret "2335 S"
+insdef void enmClosest(int varId, float varDist, float x, float y) = 2210;
+insdef void enmDamage(int id, int dmg, int...) = 2211;
+insdef void enmDamageIter(int iter, int dmg, int...) = 2212;
+insdef void enmDamageRad(int varCnt, float x, float y, float r, int maxCnt, int dmg, int...) = 2213;
+insdef void enmDamageRect(int varCnt, float x, float y, float w, float h, int maxCnt, int dmg, int...) = 2214;
+insdef void enmIterate(int varIterator, int prevIterator) = 2215;
+insdef void enmIdIter(int varId, int iterator) = 2216;
+insdef void enmIterId(int varIter, int id) = 2217;
+insdef void enmFlag(int varFlag, int id) = 2218;
+insdef void enmFlagIter(int varFlag, int iterator) = 2219;
+insdef void enmLife(int varLife, int id) = 2220;
+insdef void enmLifeIter(int varLife, int iterator) = 2221;
+insdef void enmPosIter(float x, float y, int iterator) = 2222;
+insdef void enmBombInvuln(float varInvuln, int id) = 2223;
+insdef void enmBombInvulnIter(float varInvuln, int iterator) = 2224;
+insdef void enmDamageRectRot(int varCnt, float x, float y, float w, float h, float rot, int maxCnt, int dmg, int...) = 2225;
 
+insdef int dataNewArr(int length) = 2300;
+insdef int dataNewMap() = 2301;
+insdef int dataCopy(int hStruct) = 2302;
+insdef int dataCopyDeep(int hStruct) = 2303;
+insdef void dataDelete(int hStruct) = 2304;
+insdef void dataDeleteDeep(int hStruct) = 2305;
+insdef void dataDeleteEnm(int enmId) = 2306;
+
+insdef void dataArrSetInt(int hStruct, int index, int val) = 2307;
+insdef void dataArrSetFloat(int hStruct, int index, float val) = 2308;
+insdef void dataArrSetHandle(int hStruct, int index, int hStructVal) = 2309;
+insdef void dataArrPushInt(int hStruct, int val) = 2310;
+insdef void dataArrPushFloat(int hStruct, float val) = 2311;
+insdef void dataArrPushHandle(int hStruct, int hStructVal) = 2312;
+insdef void dataArrPrependInt(int hStruct, int val) = 2313;
+insdef void dataArrPrependFloat(int hStruct, float val) = 2314;
+insdef void dataArrPrependHandle(int hStruct, int hStructVal) = 2315;
+insdef void dataArrSplice(int hStruct, int index, int cnt) = 2316;
+insdef void dataArrResize(int hStruct, int newSize) = 2317;
+
+insdef void dataMapSetInt(int hStruct, int key, int val) = 2318;
+insdef void dataMapSetFloat(int hStruct, int key, float val) = 2319;
+insdef void dataMapSetHandle(int hStruct, int key, int hStructVal) = 2320;
+insdef void dataMapDelete(int hStruct, int key) = 2321;
+
+insdef int dataType(int hStruct) = 2322;
+
+insdef int dataArrGetType(int hStruct, int index) = 2323;
+insdef int dataArrPopInt(int hStruct) = 2324;
+insdef float dataArrPopFloat(int hStruct) = 2325;
+insdef int dataArrPopHandle(int hStruct) = 2326;
+insdef int dataArrGetInt(int hStruct, int index) = 2327;
+insdef float dataArrGetFloat(int hStruct, int index) = 2328;
+insdef int dataArrGetHandle(int hStruct, int index) = 2329;
+insdef int dataArrGetLength(int hStruct) = 2330;
+
+insdef int dataMapExists(int hStruct, int key) = 2331;
+insdef int dataMapGetType(int hStruct, int key) = 2332;
+insdef int dataMapGetInt(int hStruct, int key) = 2333;
+insdef float dataMapGetFloat(int hStruct, int key) = 2334;
+insdef int dataMapGetHandle(int hStruct, int key) = 2335;
 
 inline void msgWait(int channel) {
 	int received = false;
@@ -176,3 +159,8 @@ global ANCHOR_LEFT = 1;
 global ANCHOR_RIGHT = 2;
 global ANCHOR_TOP = 1;
 global ANCHOR_BOTTOM = 2;
+
+global DATAVALUE_INVALID = 0;
+global DATAVALUE_INT = 1;
+global DATAVALUE_FLOAT = 2;
+global DATAVALUE_HANDLE = 3;
