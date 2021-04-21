@@ -21,6 +21,7 @@
 #include "ins2000.h"
 #include "ins2100.h"
 #include "ins2200.h"
+#include "ins2300.h"
 #include "intvar.h"
 #include "binhack.h"
 
@@ -38,6 +39,8 @@ static VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
             success = ins_2100(enm, ins);
         } else if (ins->id >= 2200 && ins->id < 2300) {
             success = ins_2200(enm, ins);
+        } else if (ins->id >= 2300 && ins->id < 2400) {
+            success = ins_2300(enm, ins);
         }
     #ifdef DEV
         else {

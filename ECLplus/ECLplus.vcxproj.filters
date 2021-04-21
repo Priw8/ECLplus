@@ -25,6 +25,9 @@
     <ClCompile Include="binhack.cpp">
       <Filter>Source files</Filter>
     </ClCompile>
+    <ClCompile Include="ins2300.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -46,6 +49,9 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="binhack.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="ins2300.h">
       <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -22,11 +22,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 #include <map>
 #include <list>
 #include <array>
 #include <vector>
 #include <algorithm>
+#include <vector>
 #include <windows.h>
 
 #endif //PCH_H

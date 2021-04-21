@@ -77,6 +77,43 @@
 2224 enmBombInvulnIter
 2225 enmDamageRectRot
 
+2300 dataNewArr
+2301 dataNewMap
+2302 dataCopy
+2303 dataCopyDeep
+2304 dataDelete
+2305 dataDeleteDeep
+2306 dataDeleteEnm
+2307 dataArrSetInt
+2308 dataArrSetFloat
+2309 dataArrSetHandle
+2310 dataArrPushInt
+2311 dataArrPushFloat
+2312 dataArrPushHandle
+2313 dataArrPrependInt
+2314 dataArrPrependFloat
+2315 dataArrPrependHandle
+2316 dataArrSplice
+2317 dataArrResize
+2318 dataMapSetInt
+2319 dataMapSetFloat
+2320 dataMapSetHandle
+2321 dataMapDelete
+2322 dataType
+2323 dataArrGetType
+2324 dataArrPopInt
+2325 dataArrPopFloat
+2326 dataArrPopHandle
+2327 dataArrGetInt
+2328 dataArrGetFloat
+2329 dataArrGetHandle
+2330 dataArrGetLength
+2331 dataMapExists
+2332 dataMapGetType
+2333 dataMapGetInt
+2334 dataMapGetFloat
+2335 dataMapGetHandle
+
 !gvar_names
 -8000 INPUT
 -7999 SCORE
