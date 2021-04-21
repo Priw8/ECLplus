@@ -122,8 +122,8 @@ static BOOL CollisionCheckCircleRect(COLLISION_CIRCLE *circ, COLLISION_RECT *rec
 
     // rotate so that rectangle is on the axes
     if (rect->rotation != 0) {
-        FLOAT c = cos(-rect->rotation);
-        FLOAT s = sin(-rect->rotation);
+        FLOAT c = cosf(-rect->rotation);
+        FLOAT s = sinf(-rect->rotation);
         FLOAT xDiffNew = xDiff * c - yDiff * s;
         yDiff = xDiff * s + yDiff * c;
         xDiff = xDiffNew;

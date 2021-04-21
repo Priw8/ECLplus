@@ -26,7 +26,7 @@
 #include "binhack.h"
 
 /* Executes an extra ECL instruction, called by the modified game. */
-static VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
+VOID __stdcall InsSwitch(ENEMY* enm, INSTR* ins) {
     CHAR buf[256];
     BOOL success;
     /* Since some instructions work on pointers passed directly from ECL,
