@@ -513,6 +513,15 @@ BOOL ins_2300(ENEMY* enm, INSTR* ins) {
             }
             break;
         }
+        case INS_STRUCT_DELETE_ALL: {
+            DATASTRUCT* strct = structs.head;
+            while (strct) {
+                DATASTRUCT* nextStrct = strct->next;
+                StructDelete(strct, FALSE);
+                strct = nextStrct;
+            }
+            break;
+        }
         default:
             return FALSE;
     }

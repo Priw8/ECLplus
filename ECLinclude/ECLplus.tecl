@@ -120,6 +120,8 @@ insdef int dataMapGetInt(int hStruct, int key) = 2333;
 insdef float dataMapGetFloat(int hStruct, int key) = 2334;
 insdef int dataMapGetHandle(int hStruct, int key) = 2335;
 
+insdef void dataDeleteAll() = 2336;
+
 inline void msgWait(int channel) {
 	int received = false;
 	goto BEGIN;
