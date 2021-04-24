@@ -289,7 +289,8 @@ BOOL ins_2300(ENEMY* enm, INSTR* ins) {
             LONG cnt = GetIntArg(enm, 2);
             if (StructArrValid(strct)) {
                 if (cnt > 0 && index >= 0) {
-                    if ((DWORD)(index + cnt) < strct->arr->size()) {
+                    // -1 because it uses the given index before indices after it
+                    if ((DWORD)(index + cnt - 1) < strct->arr->size()) {
                         auto begin = strct->arr->begin() + index;
                         auto end = begin + cnt;
                         strct->arr->erase(begin, end);
